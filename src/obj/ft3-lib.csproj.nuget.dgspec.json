@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/simon/git/ft3-lib/ft3-lib.csproj": {}
+    "/home/simon/git/ft3-lib/src/ft3-lib.csproj": {}
   },
   "projects": {
-    "/home/simon/git/ft3-lib/ft3-lib.csproj": {
+    "/home/simon/git/ft3-lib/src/ft3-lib.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/simon/git/ft3-lib/ft3-lib.csproj",
+        "projectUniqueName": "/home/simon/git/ft3-lib/src/ft3-lib.csproj",
         "projectName": "ft3-lib",
-        "projectPath": "/home/simon/git/ft3-lib/ft3-lib.csproj",
+        "projectPath": "/home/simon/git/ft3-lib/src/ft3-lib.csproj",
         "packagesPath": "/home/simon/.nuget/packages/",
-        "outputPath": "/home/simon/git/ft3-lib/obj/",
+        "outputPath": "/home/simon/git/ft3-lib/src/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "/usr/share/dotnet/sdk/NuGetFallbackFolder"
@@ -44,6 +44,10 @@
               "target": "Package",
               "version": "[2.0.3, )",
               "autoReferenced": true
+            },
+            "PostchainClient": {
+              "target": "Package",
+              "version": "[0.3.4, )"
             }
           },
           "imports": [

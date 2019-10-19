@@ -5,4 +5,8 @@
     <RootNamespace>ft3_lib</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="PostchainClient" Version="0.3.4" />
+  </ItemGroup>
+
 </Project>
