@@ -24,12 +24,12 @@ namespace Chromia.Postchain.Ft3
 
             if(chainConnectionInfo == null)
             {
-                throw new Exception("Cannot find details for chain with RID: " + Util.Util.ByteArrayToString(blockchainRID));
+                throw new Exception("Cannot find details for chain with RID: " + Util.ByteArrayToString(blockchainRID));
             }
 
             var connection = new ConnectionClient(
                 chainConnectionInfo.Url, 
-                Util.Util.ByteArrayToString(blockchainRID)
+                Util.ByteArrayToString(blockchainRID)
             );
 
             var info = await BlockchainInfo.GetInfo(connection);
@@ -44,6 +44,16 @@ namespace Chromia.Postchain.Ft3
         public async Task<Account[]> GetAccountsByParticipantId(byte[] id, User user)
         {
             // return await Account.get
+        }
+
+
+
+
+
+
+        public async Task<dynamic> Query(string name, params dynamic[] queryObject)
+        {
+            return await this.Connection.Query(name, queryObject);
         }
     }
 

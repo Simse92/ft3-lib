@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Chromia.Postchain.Ft3.Util
+namespace Chromia.Postchain.Ft3
 {
     public static class Util
     {

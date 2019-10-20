@@ -1,5 +1,3 @@
-using Chromia.Postchain.Ft3.Util;
-
 namespace Chromia.Postchain.Ft3
 {
     public class Transaction
