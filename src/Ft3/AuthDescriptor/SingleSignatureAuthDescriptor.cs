@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -26,11 +26,13 @@ namespace Chromia.Postchain.Ft3
 
         public dynamic[] ToGTV()
         {
+            // ToDo
             return null;
         }
 
         public byte[] Hash()
         {
+            // ToDo
             return null;
         }
     }

@@ -1,6 +1,7 @@
+using System.Collections.Generic;
+
 namespace Chromia.Postchain.Ft3
 {
-
     public class User
     {
         public KeyPair KeyPair;
@@ -13,10 +14,23 @@ namespace Chromia.Postchain.Ft3
             this.AuthDescriptor = authDescriptor;
         }
 
-        public static User GenerateSingleSigUser()
+        public static User GenerateSingleSigUser(FlagsType[] flags = null)
         {
-            return null;
+            if(flags == null)
+            {
+                var defaultFlags = new List<FlagsType>(){FlagsType.Account, FlagsType.Transfer};
+                flags = defaultFlags.ToArray();
+            }
+
+            var keyPair = new KeyPair();
+
+            return new User(
+                keyPair,
+                new SingleSignatureAuthDescriptor(
+                    keyPair.PubKey,
+                    flags
+                )
+            );
         }
     }
-
 }

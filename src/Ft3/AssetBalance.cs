@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Chromia.Postchain.Ft3
 {
-
     public class AssetBalance
     {
         public int Amount;
@@ -15,7 +14,7 @@ namespace Chromia.Postchain.Ft3
             this.Asset = asset;
         }
 
-        public static async Task<List<AssetBalance>> GetAccountId(byte[] id, Blockchain blockchain)
+        public static async Task<List<AssetBalance>> GetByAccountId(byte[] id, Blockchain blockchain)
         {
             var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_balances", ("account_id", Util.ByteArrayToString(id)));
             List<AssetBalance> assetsBalances = new List<AssetBalance>();

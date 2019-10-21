@@ -1,10 +1,7 @@
-using Chromia.Postchain.Client.GTV;
-
 namespace Chromia.Postchain.Ft3
 {
     public class AuthDescriptorFactory
     {
-
         public AuthDescriptor Create(AuthType type, byte[] args)
         {
             switch(type)
@@ -16,7 +13,8 @@ namespace Chromia.Postchain.Ft3
         }
 
         private SingleSignatureAuthDescriptor CreateSingleSig(byte[] args)
-        {
+        {   
+            // ToDo
             // var decodedDescriptor = gtv.decodeGtv(args);
             // return new SingleSignatureAuthDescriptor(
             // Buffer.from(decodedDescriptor[1], 'hex'),

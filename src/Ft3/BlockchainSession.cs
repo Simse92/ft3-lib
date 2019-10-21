@@ -19,12 +19,12 @@ namespace Chromia.Postchain.Ft3
             return await Account.GetById(id, this);
         }
 
-        public async Task<List<Account>> GetAccountsByParticipantId(byte[] id)
+        public async Task<Account[]> GetAccountsByParticipantId(byte[] id)
         {
             return await Account.GetByParticipantId(id, this);
         }
 
-        public async Task<List<Account>> GetAccountsByAuthDescriptor(byte[] id)
+        public async Task<Account[]> GetAccountsByAuthDescriptorId(byte[] id)
         {
             return await Account.GetByAuthDescriptorId(id, this);
         }
@@ -34,8 +34,9 @@ namespace Chromia.Postchain.Ft3
             return await this.Blockchain.Query(name, queryObject);
         }
 
-        // async call(...args: Array<GtvSerializable>): Promise<any> {
-        //     return await this.blockchain.call(this.user, ...args);
-        // }
+        public async Task<dynamic> Call(params GtvSerializable[] args)
+        {
+            return await this.Blockchain.Call(this.User, args);
+        }
     }
 }

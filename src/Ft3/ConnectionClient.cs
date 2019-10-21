@@ -8,7 +8,7 @@ namespace Chromia.Postchain.Ft3
     {
         public string ChainUrl;
         public string ChainID;
-        public Client.GTX.GTXClient Gtx;
+        public GTXClient Gtx;
 
         public ConnectionClient(string chainURL, string chainID)
         {

@@ -29,17 +29,22 @@ namespace Chromia.Postchain.Ft3
             return new Asset(name, chainId);
         }
 
-        public static async Task<List<Asset>> GetByName(string name, Blockchain blockchain)
+        public static async Task<Asset[]> GetByName(string name, Blockchain blockchain)
         {
             var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_by_name", ("name", name));
             List<Asset> assetList = new List<Asset>();
 
             foreach (var asset in assets)
             {
-                assetList.Add(new Asset(asset["name"], Util.HexStringToBuffer(asset["issuing_chain_rid"])));
+                assetList.Add(
+                    new Asset(
+                        asset["name"],
+                        Util.HexStringToBuffer(asset["issuing_chain_rid"])
+                    )
+                );
             }
 
-            return assetList;
+            return assetList.ToArray();
         }
     }
 
