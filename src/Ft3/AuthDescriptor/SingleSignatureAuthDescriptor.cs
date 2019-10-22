@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Chromia.Postchain.Client.GTX;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -26,14 +27,22 @@ namespace Chromia.Postchain.Ft3
 
         public dynamic[] ToGTV()
         {
-            // ToDo
-            return null;
+            var gtv = new List<dynamic>(){
+                Util.AuthTypeToString(AuthType.SingleSig),
+                new List<string>(){Util.ByteArrayToString(this.PubKey)}.ToArray(),
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}
+            };
+            return gtv.ToArray();
         }
 
         public byte[] Hash()
         {
-            // ToDo
-            return null;
+            var gtv = new List<dynamic>(){
+                Util.AuthTypeToString(AuthType.SingleSig),
+                new List<byte[]>(){this.PubKey}.ToArray(),
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}
+            };
+            return Gtx.ArgToGTXValue(gtv).Encode();
         }
     }
 }

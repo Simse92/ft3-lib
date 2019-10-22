@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Chromia.Postchain.Ft3
 {
     public class Transaction
@@ -17,9 +19,9 @@ namespace Chromia.Postchain.Ft3
             return this;
         }
 
-        public async void Post()
+        public async Task<dynamic> Post()
         {
-            await this._tx.PostAndWaitConfirmation();
+            return await this._tx.PostAndWaitConfirmation();
         }
     }
 

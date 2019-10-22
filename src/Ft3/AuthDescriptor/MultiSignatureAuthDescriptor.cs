@@ -1,3 +1,4 @@
+using Chromia.Postchain.Client.GTX;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -34,16 +35,46 @@ namespace Chromia.Postchain.Ft3
         
         public dynamic[] ToGTV()
         {
-            // ToDo
-            return null;
+            var hexPubs = new List<string>();
+            foreach (var pubkey in this.PubKeys)
+            {
+                hexPubs.Add(Util.ByteArrayToString(pubkey));
+            }
+
+            var gtv = new List<dynamic>(){
+                Util.AuthTypeToString(AuthType.MultiSig),
+                hexPubs.ToArray(),
+                new List<dynamic>()
+                {
+                    this.Flags.ToGTV(),
+                    this.SignatureRequired,
+                    hexPubs.ToArray()
+                }
+            };
+            return gtv.ToArray();
         }
 
         public byte[] Hash()
         {
-            // ToDo
-            return null;
+            var hexPubs = new List<string>();
+            foreach (var pubkey in this.PubKeys)
+            {
+                hexPubs.Add(Util.ByteArrayToString(pubkey));
+            }
+
+
+            var gtv = new List<dynamic>(){
+                Util.AuthTypeToString(AuthType.MultiSig),
+                this.PubKeys.ToArray(),
+                new List<dynamic>()
+                {
+                    this.Flags.ToGTV(),
+                    this.SignatureRequired,
+                    hexPubs.ToArray()
+                }
+            };
+
+            return Gtx.ArgToGTXValue(gtv).Encode();
         }
-
     }
-
 }

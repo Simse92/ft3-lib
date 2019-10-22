@@ -29,6 +29,19 @@ namespace Chromia.Postchain.Ft3
 
             return hex.ToString();
         }
+
+        public static string AuthTypeToString(AuthType type)
+        {
+            switch(type)
+            {
+                case AuthType.SingleSig:
+                    return "S";
+                case AuthType.MultiSig:
+                    return "M";
+                default:
+                    return "";
+            }
+        }
         
     }
 }

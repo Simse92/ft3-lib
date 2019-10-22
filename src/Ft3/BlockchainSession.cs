@@ -34,7 +34,7 @@ namespace Chromia.Postchain.Ft3
             return await this.Blockchain.Query(name, queryObject);
         }
 
-        public async Task<dynamic> Call(params GtvSerializable[] args)
+        public async Task<dynamic> Call(params dynamic[] args)
         {
             return await this.Blockchain.Call(this.User, args);
         }

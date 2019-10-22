@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -14,11 +15,6 @@ namespace Chromia.Postchain.Ft3
     {
         Account,
         Transfer
-    }
-
-    public interface GtvSerializable
-    {
-        dynamic[] ToGTV();
     }
 
     public class Flags
@@ -36,20 +32,24 @@ namespace Chromia.Postchain.Ft3
             return this.FlagList.Contains(flag);
         }
 
-        public void ToGTV()
+        public dynamic[] ToGTV()
         {
             // ToDo
+
+            return null;
         }
     }
 
-    public interface AuthDescriptor : GtvSerializable
+    public interface AuthDescriptor
     {
         byte[] Hash();
+        List<byte[]> GetSigners();
+        byte[] GetId();
     }
 
     public class Account
     {
-        // private paymentHistorySyncManager = new PaymentHistorySyncManager();
+        private PaymentHistorySyncManager _paymentHistorySyncManager = new PaymentHistorySyncManager();
         public readonly byte[] Id;
         public List<AuthDescriptor> AuthDescriptor;
         public List<AssetBalance> Assets = new List<AssetBalance>();
@@ -101,11 +101,10 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account> Register(AuthDescriptor authDescriptor, BlockchainSession session)
         {
-            // ToDo
-            // await session.call(...this.registerOp(authDescriptor));
-            // const account = new Account(authDescriptor.hash(), [authDescriptor], session);
-            // await account.syncAssets();
-            return null;
+            await session.Call(Account.RegisterOp(authDescriptor).ToArray());
+            var account = new Account(authDescriptor.Hash(), new List<AuthDescriptor>{authDescriptor}.ToArray(), session);
+            await account.SyncAssets();
+            return account;
         }
         public static async Task<Account[]> GetByIds(List<byte[]> ids, BlockchainSession session)
         {
@@ -156,17 +155,22 @@ namespace Chromia.Postchain.Ft3
 
         public async void AddAuthDescriptor(AuthDescriptor authDescriptor)
         {
-            // ToDo
+            await this.Session.Call(AddAuthDescriptorOp(authDescriptor).ToArray());
+            this.AuthDescriptor.Add(authDescriptor);
         }
 
-        public async void DeleteAllAuthDescriptorsExclude()
+        public async Task DeleteAllAuthDescriptorsExclude(AuthDescriptor authDescriptor)
         {
-            // ToDo
+            await this.Session.Call(
+                "ft3.delete_all_auth_descriptors_exclude",
+                this.Id,
+                authDescriptor.GetId()
+            );
         }
 
-        public async void Sync()
+        public void Sync()
         {
-            // ToDo
+            // ToDo Neccessary?
         }
 
         private async Task SyncAssets()
@@ -179,50 +183,119 @@ namespace Chromia.Postchain.Ft3
             return this.Assets.Find(assetBalance => assetBalance.Asset.GetId().Equals(id));
         }
 
-        public async void TransferInputsToOutputs(List<GtvSerializable> inputs, List<GtvSerializable> outputs)
+        public async Task TransferInputsToOutputs(List<dynamic> inputs, List<dynamic> outputs)
         {
-            // ToDo
+            var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
+            transactionBuilder.AddOperation("ft3.transfer", inputs, outputs);
+            transactionBuilder.AddOperation("nop", new Random().Next().ToString());
+            var tx = transactionBuilder.Build(this.Session.User.AuthDescriptor.GetSigners());
+            tx.Sign(this.Session.User.KeyPair);
+            await tx.Post();
+            await this.SyncAssets();
         }
 
         public async void Transfer(byte[] accountId, byte[] assetId, float amount)
         {
-            // ToDo
+            var input = new List<dynamic>{
+                this.Id,
+                assetId,
+                this.AuthDescriptor[0].Hash(),
+                amount,
+                new dynamic[] {}
+            };
+
+            var output = new List<dynamic>{
+                accountId,
+                assetId,
+                amount,
+                new dynamic[] {}
+            };
+
+            await this.TransferInputsToOutputs(input, output);
         }
 
         public async void BurnTokens(byte[] assetId, float amount)
         {
-            // ToDo
+            var input = new List<dynamic>(){
+                this.Id,
+                assetId,
+                this.AuthDescriptor[0].Hash(),
+                amount,
+                new dynamic[] {}
+            };
+
+            await this.TransferInputsToOutputs(input, new List<dynamic>{});
         }
 
         public async Task<dynamic> GetPaymentHistory()
         {
-            
+            return await PaymentHistory.GetAccountById(this.Id, this.Session.Blockchain.Connection);
         }
 
         public async Task<PaymentHistoryIterator> GetPaymentHistoryIterator(int pageSize)
         {
-
+            if(pageSize < 1)
+            {
+                throw new Exception("Page size has to be greater than 1");
+            }
+            await this._paymentHistorySyncManager.SyncAccount(this.Id, this.Session.Blockchain);
+            return this._paymentHistorySyncManager.PaymentHistoryStore.GetIterator(this.Id, pageSize);
         }
 
         public async Task XcTransfer(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, float amount)
         {
-
+            var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
+            transactionBuilder.AddOperation(XcTransferOp(destinationChainId, destinationAccountId, assetId, amount));
+            transactionBuilder.AddOperation("nop", new Random().Next().ToString());
+            var tx = transactionBuilder.Build(this.Session.User.AuthDescriptor.GetSigners());
+            tx.Sign(this.Session.User.KeyPair);
+            await tx.Post();
+            await this.SyncAssets();
         }
 
         /* Operation and query */
-        public List<GtvSerializable> XcTransferOp(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, float amount)
+        public dynamic[] XcTransferOp(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, float amount)
         {
-            return null;
+            var gtv = new List<dynamic>() {
+                "ft3.xc.init_xfer",
+                new List<dynamic>() {
+                    this.Id,
+                    assetId,
+                    this.Session.User.AuthDescriptor.GetId(),
+                    amount,
+                    new dynamic[] {}
+                }.ToArray(),
+                new List<dynamic>() {
+                    destinationAccountId,
+                    new dynamic[] {}
+                }.ToArray(),
+                new List<byte[]>(){
+                    destinationChainId
+                }.ToArray()
+            };
+            return gtv.ToArray();
         }
 
-        public List<GtvSerializable> AddAuthDescriptorOp(AuthDescriptor authDescriptor)
+        public dynamic[] AddAuthDescriptorOp(AuthDescriptor authDescriptor)
         {
-            return null;
+            var gtv = new List<dynamic>() {
+                "ft3.add_auth_descriptor",
+                this.Id,
+                this.Session.User.AuthDescriptor.GetId(),
+                authDescriptor
+            };
+
+            return gtv.ToArray();
         }
 
-        public static List<GtvSerializable> RegisterOp(AuthDescriptor authDescriptor)
+        public static dynamic[] RegisterOp(AuthDescriptor authDescriptor)
         {
-            return null;
+            var gtv = new List<dynamic>() {
+                "ft3.dev_register_account",
+                authDescriptor
+            };
+
+            return gtv.ToArray();
         }
     }
 }

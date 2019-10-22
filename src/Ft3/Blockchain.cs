@@ -84,7 +84,7 @@ namespace Chromia.Postchain.Ft3
 
             foreach (var linkedChain in linkedChains)
             {
-                chainIds.Add(Util.HexStringToBuffer(linkedChain["chainId"]));
+                chainIds.Add(Util.HexStringToBuffer((string) linkedChain["chainId"]));
             }
 
             return chainIds;
@@ -93,7 +93,13 @@ namespace Chromia.Postchain.Ft3
         public async Task<Blockchain[]> GetLinkedChains()
         {
             var chainIds = await this.GetLinkedChainsIds();
-            // ToDo
+            var blockchains = new List<Blockchain>();
+            foreach (var chainId in chainIds)
+            {
+                blockchains.Add(await Blockchain.Initialize(chainId, this._directoryService));
+            }
+
+            return blockchains.ToArray();
         }
 
         public async Task<dynamic> Query(string name, params dynamic[] queryObject)
@@ -101,10 +107,13 @@ namespace Chromia.Postchain.Ft3
             return await this.Connection.Query(name, queryObject);
         }
 
-        public async Task<dynamic> Call(User user, params GtvSerializable[] args)
+        public async Task<dynamic> Call(User user, params dynamic[] args)
         {
             var txBuilder = this.CreateTransactionBuilder();
-            // ToDo
+            txBuilder.AddOperation(args);
+            var tx = txBuilder.Build(user.AuthDescriptor.GetSigners());
+            tx.Sign(user.KeyPair);
+            return await tx.Post();
         }
 
         public TransactionBuilder CreateTransactionBuilder()

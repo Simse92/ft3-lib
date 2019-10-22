@@ -14,6 +14,7 @@ namespace Chromia.Postchain.Ft3
         public PaymentOperation[] Extract()
         {
             // ToDO
+            return null;
         }
     }
 }
