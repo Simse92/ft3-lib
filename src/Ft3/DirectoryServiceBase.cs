@@ -14,7 +14,7 @@ namespace Chromia.Postchain.Ft3
 
         public ChainConnectionInfo GetChainConnectionInfo(byte[] id)
         {
-            return this._chainInfos.Find(info => info.ChainId.Equals(id));
+            return this._chainInfos.Find(info => Util.ByteArrayToString(info.ChainId).Equals(Util.ByteArrayToString(id)));
         }
     }
 }

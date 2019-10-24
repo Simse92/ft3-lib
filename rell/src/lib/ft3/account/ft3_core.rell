@@ -1,0 +1,4 @@
+include "main";
+include "asset";
+include "history";
+include "transfer";

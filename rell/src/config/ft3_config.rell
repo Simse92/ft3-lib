@@ -1,0 +1,5 @@
+object ft3_config {
+  blockchain_name: text = "FT3-demo-app";
+  blockchain_website: text = "http://ft3-deamo-app";
+  blockchain_description: text = "this is test blockchain";
+}

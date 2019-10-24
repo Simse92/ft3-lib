@@ -33,7 +33,9 @@ namespace Chromia.Postchain.Ft3
                 Util.ByteArrayToString(blockchainRID)
             );
 
+            Console.WriteLine("HIER12");
             var info = await BlockchainInfo.GetInfo(connection);
+            Console.WriteLine("HIER13");
             return new Blockchain(blockchainRID, info, connection, directoryService);
         }
 

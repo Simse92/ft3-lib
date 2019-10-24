@@ -17,7 +17,9 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<BlockchainInfo> GetInfo(ConnectionClient connection)
         {
+            System.Console.WriteLine("HIER123");
             var info = await connection.Query("ft3.get_blockchain_info");
+            System.Console.WriteLine("HIER124");
             return new BlockchainInfo(info["name"], info["website"], info["description"]);
         }
     }

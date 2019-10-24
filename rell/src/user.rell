@@ -1,0 +1,45 @@
+
+// define dapp account 
+class user {
+  key username: text;
+  key account: ft3.account;
+  display_name: text;
+  first_name: text;
+  last_name: text;
+  age: integer;
+}
+
+// creates new dapp account
+operation create_user(
+  display_name: text,
+  first_name: text,
+  last_name: text,
+  age: integer,
+  user_auth: ft3.auth_descriptor
+) {
+// creates ft3 account
+  val account_id = ft3.create_account_with_auth(user_auth);
+  
+
+  create user (
+  	username = display_name.lower_case(),
+  	display_name,
+    first_name,
+    last_name,
+    age,
+    ft3.account @ { account_id }
+  );
+}
+
+query find_by_username(username: text) {
+	return user @? { 
+		.username == username.lower_case()
+	} (
+		.username,
+		.display_name,
+		.first_name,
+		.last_name,
+		.age,
+		account_id = .account.id
+	);
+}

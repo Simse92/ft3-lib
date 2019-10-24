@@ -6,7 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PostchainClient" Version="0.3.4" />
+    <Reference Include="PostchainClient">
+      <HintPath>../libs/postchain-client.dll</HintPath>
+    </Reference>
+    
+    <Reference Include="Microsoft.CSharp">
+      <HintPath>../libs/Microsoft.CSharp.dll</HintPath>
+    </Reference>
   </ItemGroup>
-
 </Project>
