@@ -1,3 +1,5 @@
+using Chromia.Postchain.Client.GTX.ASN1Messages;
+
 namespace Chromia.Postchain.Ft3
 {
     public class PaymentOperationExtractor
@@ -13,7 +15,12 @@ namespace Chromia.Postchain.Ft3
 
         public PaymentOperation[] Extract()
         {
-            // ToDO
+            // Todo Not Supported
+            // var transaction = gtx.deserialize(this.transaction);
+            GTXValue value = null;
+
+            
+
             return null;
         }
     }

@@ -13,6 +13,8 @@ namespace Chromia.Postchain.Ft3
 
     public enum FlagsType
     {
+
+        None,
         Account,
         Transfer
     }
@@ -34,9 +36,16 @@ namespace Chromia.Postchain.Ft3
 
         public dynamic[] ToGTV()
         {
-            // ToDo
+            var validFlags = new List<string>();
+            foreach (var flag in this.FlagList)
+            {
+                if(this.FlagsOrder.Contains(flag))
+                {
+                    validFlags.Add(Util.FlagTypeToString(flag));
+                }
+            }
 
-            return null;
+            return validFlags.ToArray();
         }
     }
 
@@ -166,11 +175,6 @@ namespace Chromia.Postchain.Ft3
                 this.Id,
                 authDescriptor.GetId()
             );
-        }
-
-        public void Sync()
-        {
-            // ToDo Neccessary?
         }
 
         private async Task SyncAssets()

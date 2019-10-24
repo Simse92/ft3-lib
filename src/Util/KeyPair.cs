@@ -26,7 +26,5 @@ namespace Chromia.Postchain.Ft3
         {
             return Client.Util.MakeKeyPair();
         }
-
     }
-
 }

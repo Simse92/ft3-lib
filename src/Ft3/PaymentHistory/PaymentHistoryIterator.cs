@@ -28,15 +28,7 @@ namespace Chromia.Postchain.Ft3
 
         public int GetCurrent()
         {
-            // ToDo
-            if(this.GetPageCount() == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return this._currentPage;
-            }
+            return this.GetPageCount() != 0 ? this._currentPage : 0;
         }
 
         public PaymentHistoryEntry[] Rewind()

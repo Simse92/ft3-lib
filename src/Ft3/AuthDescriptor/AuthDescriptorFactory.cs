@@ -18,11 +18,18 @@ namespace Chromia.Postchain.Ft3
         {   
             // ToDo
             // var decodedDescriptor = gtv.decodeGtv(args);
-            // return new SingleSignatureAuthDescriptor(
-            // Buffer.from(decodedDescriptor[1], 'hex'),
-            // decodedDescriptor[0]
-            // );
-            return null;
+            dynamic[] decodedDescriptor = {};
+            var flags = new List<FlagsType>();
+
+            foreach (var flag in decodedDescriptor[0])
+            {
+                flags.Add(Util.StringToFlagType((string) flag));
+            }
+            
+            return new SingleSignatureAuthDescriptor(
+                Util.HexStringToBuffer((string) decodedDescriptor[1]),
+                flags.ToArray()
+            );
         }
     }
 }

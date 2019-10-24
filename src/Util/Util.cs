@@ -6,11 +6,6 @@ namespace Chromia.Postchain.Ft3
 {
     public static class Util
     {
-        /**
-        * Converts hex string to Buffer
-        * @param key: string
-        * @returns {Buffer}
-        */
         public static byte[] HexStringToBuffer(string text)
         {
             return Enumerable.Range(0, text.Length)
@@ -43,5 +38,30 @@ namespace Chromia.Postchain.Ft3
             }
         }
         
+        public static string FlagTypeToString(FlagsType type)
+        {
+            switch(type)
+            {
+                case FlagsType.Account:
+                    return "A";
+                case FlagsType.Transfer:
+                    return "T";
+                default:
+                    return "";
+            }
+        }
+
+        public static FlagsType StringToFlagType(string type)
+        {
+            switch(type)
+            {
+                case "A":
+                    return FlagsType.Account;
+                case "T":
+                    return FlagsType.Transfer;
+                default:
+                    return FlagsType.None;
+            }
+        }
     }
 }

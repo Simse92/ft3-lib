@@ -7,7 +7,6 @@ namespace Chromia.Postchain.Ft3
         public KeyPair KeyPair;
         public AuthDescriptor AuthDescriptor;
 
-        
         public User(KeyPair keyPair, AuthDescriptor authDescriptor)
         {
             this.KeyPair = keyPair;
@@ -18,8 +17,7 @@ namespace Chromia.Postchain.Ft3
         {
             if(flags == null)
             {
-                var defaultFlags = new List<FlagsType>(){FlagsType.Account, FlagsType.Transfer};
-                flags = defaultFlags.ToArray();
+                flags = new List<FlagsType>(){FlagsType.Account, FlagsType.Transfer}.ToArray();
             }
 
             var keyPair = new KeyPair();

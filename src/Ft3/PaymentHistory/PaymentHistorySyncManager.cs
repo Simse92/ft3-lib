@@ -17,6 +17,7 @@ namespace Chromia.Postchain.Ft3
 
     public class PaymentHistorySyncManager
     {
+        // ToDo
         public readonly PaymentHistoryStore PaymentHistoryStore = new PaymentHistoryStoreLocalStorage();
 
         public async Task SyncAccount(byte[] id, Blockchain blockchain)

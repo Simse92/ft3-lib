@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace Chromia.Postchain.Ft3
 {
     public class TransferOperation
@@ -5,16 +8,32 @@ namespace Chromia.Postchain.Ft3
         public readonly TransferParam[] Inputs;
         public readonly TransferParam[] Outputs;
 
-        public TransferOperation(TransferParam[] inputs, TransferParam[] outputs)
+        public TransferOperation(IEnumerable<TransferParam> inputs, IEnumerable<TransferParam> outputs)
         {
-            this.Inputs = inputs;
-            this.Outputs = outputs;
+            this.Inputs = inputs.ToArray();
+            this.Outputs = outputs.ToArray();
         }
 
         public static TransferOperation From(dynamic rawTransfer)
         {
-            // ToDo
-           return null;
+            var inputs = new List<TransferParam>();
+            var outputs = new List<TransferParam>();
+
+            foreach (var input in rawTransfer["args"][0])
+            {
+                inputs.Add(
+                    new TransferParam((string) input[0], (string) input[1], (float) input[3])
+                );
+            }
+
+            foreach (var input in rawTransfer["args"][1])
+            {
+                outputs.Add(
+                    new TransferParam((string) input[0], (string) input[1], (float) input[2])
+                );
+            }
+        
+           return new TransferOperation(inputs, outputs);
         }
     }
 }
