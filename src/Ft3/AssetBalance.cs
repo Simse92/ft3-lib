@@ -50,7 +50,7 @@ namespace Chromia.Postchain.Ft3
             return new AssetBalance(asset["amount"], new Asset(asset["name"], asset["chainId"]));
         }
 
-        public static async void GiveBalance(byte[] accountId, byte[] assetId, float amount, Blockchain blockchain)
+        public static async Task GiveBalance(byte[] accountId, byte[] assetId, float amount, Blockchain blockchain)
         {
             var tx = blockchain.Connection.Gtx.NewTransaction(new byte[][] {});
             tx.AddOperation("ft3.dev_give_balance", Util.ByteArrayToString(assetId), Util.ByteArrayToString(accountId), amount);

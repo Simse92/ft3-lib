@@ -16,8 +16,10 @@ public class UserTest
        Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
 
        User user = TestUser.SingleSig();
-       //Account account = await Account.Register(user.AuthDescriptor, blockchain.NewSession(user));
+       // Dev Account
+       // Account account = await Account.Register(user.AuthDescriptor, blockchain.NewSession(user));
 
+       // Dapp user
        await blockchain.Call(
             user,
             "create_user",
