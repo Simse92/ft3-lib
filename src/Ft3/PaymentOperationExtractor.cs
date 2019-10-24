@@ -17,7 +17,7 @@ namespace Chromia.Postchain.Ft3
         {
             // Todo Not Supported
             // var transaction = gtx.deserialize(this.transaction);
-            GTXValue value = null;
+            // GTXValue value = null;
 
             
 

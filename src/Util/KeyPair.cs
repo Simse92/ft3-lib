@@ -18,7 +18,7 @@ namespace Chromia.Postchain.Ft3
             {
                 var keyPair = Client.Util.MakeKeyPair();
                 this.PubKey = keyPair["pubKey"];
-                this.PubKey = keyPair["privKey"];
+                this.PrivKey = keyPair["privKey"];
             }
         }
 

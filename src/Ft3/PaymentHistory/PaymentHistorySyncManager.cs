@@ -20,9 +20,9 @@ namespace Chromia.Postchain.Ft3
         // ToDo
         public readonly PaymentHistoryStore PaymentHistoryStore = new PaymentHistoryStoreLocalStorage();
 
-        public async Task SyncAccount(byte[] id, Blockchain blockchain)
+        public Task SyncAccount(byte[] id, Blockchain blockchain)
         {
-
+            return null;
         }
 
         private PaymentHistoryEntry[] MapShortEntriesToLongEntries(PaymentHistoryEntryShort[] entries)

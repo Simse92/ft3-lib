@@ -15,7 +15,6 @@ namespace Chromia.Postchain.Ft3
             this.ChainUrl = chainURL;
             this.ChainID = chainID;
 
-            System.Console.WriteLine("ID " + chainID);
             var restClient = new RESTClient(chainURL, chainID);
             this.Gtx = new GTXClient(restClient, chainID);
         }

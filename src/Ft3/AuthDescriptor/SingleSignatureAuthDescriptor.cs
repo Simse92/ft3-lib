@@ -30,7 +30,7 @@ namespace Chromia.Postchain.Ft3
             var gtv = new List<dynamic>(){
                 Util.AuthTypeToString(AuthType.SingleSig),
                 new List<string>(){Util.ByteArrayToString(this.PubKey)}.ToArray(),
-                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}.ToArray()
             };
             return gtv.ToArray();
         }
@@ -40,8 +40,8 @@ namespace Chromia.Postchain.Ft3
             var gtv = new List<dynamic>(){
                 Util.AuthTypeToString(AuthType.SingleSig),
                 new List<byte[]>(){this.PubKey}.ToArray(),
-                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}
-            };
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}.ToArray()
+            }.ToArray();
             return Gtx.ArgToGTXValue(gtv).Encode();
         }
     }

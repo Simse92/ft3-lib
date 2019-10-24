@@ -6,12 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+
     <Reference Include="PostchainClient">
       <HintPath>../libs/postchain-client.dll</HintPath>
     </Reference>
-    
-    <Reference Include="Microsoft.CSharp">
-      <HintPath>../libs/Microsoft.CSharp.dll</HintPath>
-    </Reference>
   </ItemGroup>
+
+
 </Project>

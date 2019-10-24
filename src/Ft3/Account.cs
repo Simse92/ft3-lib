@@ -111,7 +111,7 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account> Register(AuthDescriptor authDescriptor, BlockchainSession session)
         {
-            await session.Call(Account.RegisterOp(authDescriptor).ToArray());
+            await session.Call(Account.RegisterOp(authDescriptor));
             var account = new Account(authDescriptor.Hash(), new List<AuthDescriptor>{authDescriptor}.ToArray(), session);
             await account.SyncAssets();
             return account;
@@ -297,7 +297,7 @@ namespace Chromia.Postchain.Ft3
         {
             var gtv = new List<dynamic>() {
                 "ft3.dev_register_account",
-                authDescriptor
+                authDescriptor.ToGTV()
             };
 
             return gtv.ToArray();

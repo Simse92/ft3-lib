@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -14,7 +15,14 @@ namespace Chromia.Postchain.Ft3
 
         public TransactionBuilder AddOperation(params dynamic[] args)
         {
-            this._operations.Add(ToGTV(args));
+            var test = ToGTV(args);
+            
+            foreach (var item in test)
+            {
+                System.Console.WriteLine(item);
+            }
+
+            this._operations.Add(test);
             return this;
         }
 
@@ -26,7 +34,8 @@ namespace Chromia.Postchain.Ft3
             {
                 if(arg is System.Array)
                 {
-                    gtvList.AddRange(ToGTV(arg));
+                   //gtvList.AddRange(ToGTV(arg));
+                   gtvList.Add(arg);
                 }
                 else if(arg is byte[])
                 {
@@ -50,7 +59,10 @@ namespace Chromia.Postchain.Ft3
             var tx = this.Blockchain.Connection.Gtx.NewTransaction(signers.ToArray());
             foreach (var operation in this._operations)
             {
-                tx.AddOperation(operation);
+                var type = (string) operation[0];
+                operation.Remove(operation[0]);
+
+                tx.AddOperation(type, operation.ToArray());
             }
             return new Transaction(tx, this.Blockchain);
         }
