@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Chromia.Postchain.Client.GTV;
 
 public class TestUtil
 {
@@ -17,6 +19,15 @@ public class TestUtil
         return Chromia.Postchain.Client.Util.Sha256(
             BitConverter.GetBytes(GenerateNumber())
         );
-        
+    }
+
+    public static byte[] BlockchainAccountId(byte[] chainId)
+    {
+        var gtv = new List<dynamic>(){
+            "B",
+            chainId
+            }.ToArray();
+
+        return Gtv.Hash(gtv);
     }
 }

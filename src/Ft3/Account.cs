@@ -104,7 +104,7 @@ namespace Chromia.Postchain.Ft3
             var idList = new List<byte[]>();
             foreach (var accountId in accountIds)
             {
-                idList.Add(Util.HexStringToBuffer((string) accountId["id"]));
+                idList.Add(Util.HexStringToBuffer((string) accountId));
             }
 
             return await Account.GetByIds(idList, session);
@@ -197,7 +197,7 @@ namespace Chromia.Postchain.Ft3
             var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
 
             transactionBuilder.AddOperation("ft3.transfer", inputs, outputs);
-            // transactionBuilder.AddOperation("nop", new Random().Next().ToString());
+            transactionBuilder.AddOperation("nop", new Random().Next().ToString());
             var tx = transactionBuilder.Build(this.Session.User.AuthDescriptor.GetSigners());
             tx.Sign(this.Session.User.KeyPair);
             await tx.Post();

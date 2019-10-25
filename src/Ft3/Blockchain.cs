@@ -62,7 +62,7 @@ namespace Chromia.Postchain.Ft3
             return await Asset.GetByName(name, this);
         }
 
-        public async void LinkChain(byte[] chainId)
+        public async Task LinkChain(byte[] chainId)
         {
             var tx = this.Connection.Gtx.NewTransaction(new byte[][] {});
             tx.AddOperation("ft3.link_chain", Util.ByteArrayToString(chainId));
@@ -84,7 +84,7 @@ namespace Chromia.Postchain.Ft3
 
             foreach (var linkedChain in linkedChains)
             {
-                chainIds.Add(Util.HexStringToBuffer((string) linkedChain["chainId"]));
+                chainIds.Add(Util.HexStringToBuffer((string) linkedChain));
             }
 
             return chainIds;

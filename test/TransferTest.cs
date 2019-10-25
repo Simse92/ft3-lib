@@ -77,9 +77,40 @@ public class TransferTest
         await account1.Transfer(account2.Id, asset.GetId(), 10);
     }
 
-    // should succeed burning tokens
+    // should succeed if transferring tokens to a multisig account
     [Fact(Skip = "Not now")]
     public async void TransferTestRun4()
+    {
+        Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
+        Asset asset = await Asset.Register(TestUtil.GenerateAssetName(), TestUtil.GenerateId(), blockchain);
+
+        User user = TestUser.SingleSig();
+
+        AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
+        accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
+        accountBuilder.WithBalance(asset, 200);
+        Account account1 = await accountBuilder.Build();
+
+        AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain);
+        accountBuilder2.WithParticipants(new List<KeyPair>(){new KeyPair(), new KeyPair()});
+        accountBuilder2.WithRequiredSignatures(2);
+        Account account2 = await accountBuilder2.Build();
+
+        await account1.Transfer(account2.Id, asset.GetId(), 10);
+
+        AssetBalance assetBalance1 = await AssetBalance.GetByAccountAndAssetId(account1.Id, asset.GetId(), blockchain); 
+        AssetBalance assetBalance2 = await AssetBalance.GetByAccountAndAssetId(account2.Id, asset.GetId(), blockchain);
+
+        Console.WriteLine("AssetBalance1: " + assetBalance1.Amount);
+        Console.WriteLine("AssetBalance2: " + assetBalance2.Amount);
+
+        Assert.Equal(190, assetBalance1.Amount);  
+        Assert.Equal(10, assetBalance2.Amount);
+    }
+
+    // should succeed burning tokens
+    [Fact(Skip = "Not now")]
+    public async void TransferTestRun5()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
         Asset asset = await Asset.Register(TestUtil.GenerateAssetName(), TestUtil.GenerateId(), blockchain);
@@ -98,9 +129,16 @@ public class TransferTest
     }
 
     // should have one payment history entry if one transfer made
-    // [Fact] 
-    // public async void TransferTestRun5()
-    // {
+    [Fact(Skip = "Not Implemented so fars")]
+    public void TransferTestRun6()
+    {
 
-    // }
+    }
+
+    // should have two payment history entries if two transfers made
+    [Fact(Skip = "Not Implemented so fars")]
+    public void TransferTestRun7()
+    {
+
+    }
 }
