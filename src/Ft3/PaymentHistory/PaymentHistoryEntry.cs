@@ -15,7 +15,7 @@ namespace Chromia.Postchain.Ft3
         public readonly int BlockHeight;
 
         public PaymentHistoryEntry(bool isInput, int delta, string asset,
-                                    byte[] assetId, byte[] chainId, dynamic[] other,
+                                    byte[] assetId, dynamic[] other,
                                     string timestamp, byte[] transactionId, int blockHeight)
         {
             this.IsInput = isInput;
