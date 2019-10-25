@@ -15,7 +15,6 @@ operation update_blockchain(name, website: text, description: text) {
 }
 
 query get_blockchain_info() {
-	print("HIER");
     return (
         name = blockchain.name,
         website = blockchain.website,

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client.GTV;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -42,7 +42,7 @@ namespace Chromia.Postchain.Ft3
                 new List<byte[]>(){this.PubKey}.ToArray(),
                 new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}.ToArray()
             }.ToArray();
-            return Gtx.ArgToGTXValue(gtv).Encode();
+            return Gtv.Hash(gtv);
         }
     }
 }

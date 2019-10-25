@@ -22,14 +22,14 @@ namespace Chromia.Postchain.Ft3
             foreach (var input in rawTransfer["args"][0])
             {
                 inputs.Add(
-                    new TransferParam((string) input[0], (string) input[1], (float) input[3])
+                    new TransferParam((string) input[0], (string) input[1], (int) input[3])
                 );
             }
 
             foreach (var input in rawTransfer["args"][1])
             {
                 outputs.Add(
-                    new TransferParam((string) input[0], (string) input[1], (float) input[2])
+                    new TransferParam((string) input[0], (string) input[1], (int) input[2])
                 );
             }
         

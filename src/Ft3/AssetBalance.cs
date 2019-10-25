@@ -5,10 +5,10 @@ namespace Chromia.Postchain.Ft3
 {
     public class AssetBalance
     {
-        public float Amount;
+        public int Amount;
         public Asset Asset;
 
-        public AssetBalance(float amount, Asset asset)
+        public AssetBalance(int amount, Asset asset)
         {
             this.Amount = amount;
             this.Asset = asset;
@@ -17,14 +17,14 @@ namespace Chromia.Postchain.Ft3
         public static async Task<List<AssetBalance>> GetByAccountId(byte[] id, Blockchain blockchain)
         {
             var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_balances", ("account_id", Util.ByteArrayToString(id)));
-            System.Console.WriteLine(assets);
+            System.Console.WriteLine("Assets" + assets);
             List<AssetBalance> assetsBalances = new List<AssetBalance>();
 
             foreach (var asset in assets)
             {
                 assetsBalances.Add(
                     new AssetBalance(
-                        (float) asset["amount"],
+                        (int) asset["amount"],
                         new Asset(
                             (string) asset["name"],
                             Util.HexStringToBuffer((string) asset["chain_id"])
@@ -47,10 +47,10 @@ namespace Chromia.Postchain.Ft3
                 return null;
             }
 
-            return new AssetBalance(asset["amount"], new Asset(asset["name"], asset["chainId"]));
+            return new AssetBalance((int) asset["amount"], new Asset((string) asset["name"], (byte[]) asset["chainId"]));
         }
 
-        public static async Task GiveBalance(byte[] accountId, byte[] assetId, float amount, Blockchain blockchain)
+        public static async Task GiveBalance(byte[] accountId, byte[] assetId, int amount, Blockchain blockchain)
         {
             var tx = blockchain.Connection.Gtx.NewTransaction(new byte[][] {});
             tx.AddOperation("ft3.dev_give_balance", Util.ByteArrayToString(assetId), Util.ByteArrayToString(accountId), amount);

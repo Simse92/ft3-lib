@@ -15,14 +15,7 @@ namespace Chromia.Postchain.Ft3
 
         public TransactionBuilder AddOperation(params dynamic[] args)
         {
-            var test = ToGTV(args);
-            
-            foreach (var item in test)
-            {
-                System.Console.WriteLine(item);
-            }
-
-            this._operations.Add(test);
+            this._operations.Add(ToGTV(args));
             return this;
         }
 
@@ -32,22 +25,42 @@ namespace Chromia.Postchain.Ft3
 
             foreach (var arg in args)
             {
-                if(arg is System.Array)
+                if(arg is AuthDescriptor)
                 {
-                   //gtvList.AddRange(ToGTV(arg));
-                   gtvList.Add(arg);
+                    System.Console.WriteLine("AuthDescriptorarg: " + arg);
+                    AuthDescriptor authDescriptor = (AuthDescriptor) arg;
+                    gtvList.Add(authDescriptor.ToGTV());
+                }
+                else if(arg is System.Byte[])
+                {
+                    System.Console.WriteLine("System.Byte[]: " + arg);
+                    gtvList.Add(Util.ByteArrayToString(arg));
                 }
                 else if(arg is byte[])
                 {
+                    System.Console.WriteLine("byte[]: " + arg);
                     gtvList.Add(Util.ByteArrayToString(arg));
                 }
                 else if(arg is string)
                 {
+                    System.Console.WriteLine("string: " + arg);
                     gtvList.Add(arg);
                 }
                 else if(arg is int)
                 {
+                    System.Console.WriteLine("int: " + arg);
                     gtvList.Add(arg);
+                }
+                else if(arg is System.Array)
+                {
+                    System.Console.WriteLine("System.Array: " + arg);
+
+                    // gtvList.AddRange(ToGTV(arg, ++layer));
+                    gtvList.Add(arg);
+                }
+                else
+                {
+                    Console.WriteLine("Wrong Datatype.");
                 }
             }
 

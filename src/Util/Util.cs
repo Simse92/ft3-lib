@@ -63,5 +63,18 @@ namespace Chromia.Postchain.Ft3
                     return FlagsType.None;
             }
         }
+
+        public static AuthType StringToAuthType(string type)
+        {
+            switch(type)
+            {
+                case "S":
+                    return AuthType.SingleSig;
+                case "M":
+                    return AuthType.MultiSig;
+                default:
+                    return AuthType.None;
+            }
+        }
     }
 }

@@ -5,9 +5,9 @@ namespace Chromia.Postchain.Ft3
         public readonly string ChainId;
         public readonly string AccountId;
         public readonly string AssetId;
-        public readonly float Amount;
+        public readonly int Amount;
 
-        public PaymentParam(string chainId, string accountId, string assetId, float amount)
+        public PaymentParam(string chainId, string accountId, string assetId, int amount)
         {
             this.ChainId = chainId;
             this.AccountId = accountId;

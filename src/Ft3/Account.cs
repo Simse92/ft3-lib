@@ -7,6 +7,7 @@ namespace Chromia.Postchain.Ft3
 {
     public enum AuthType
     {
+        None,
         SingleSig,
         MultiSig
     }
@@ -87,7 +88,7 @@ namespace Chromia.Postchain.Ft3
             var idList = new List<byte[]>();
             foreach (var accountId in accountIds)
             {
-                idList.Add(Util.HexStringToBuffer(accountId["id"]));
+                idList.Add(Util.HexStringToBuffer((string) accountId));
             }
 
             return await Account.GetByIds(idList, session);
@@ -103,7 +104,7 @@ namespace Chromia.Postchain.Ft3
             var idList = new List<byte[]>();
             foreach (var accountId in accountIds)
             {
-                idList.Add(Util.HexStringToBuffer(accountId["id"]));
+                idList.Add(Util.HexStringToBuffer((string) accountId["id"]));
             }
 
             return await Account.GetByIds(idList, session);
@@ -152,8 +153,8 @@ namespace Chromia.Postchain.Ft3
             {
                 authList.Add(
                     authDescriptorFactory.Create(
-                        authDescriptor["type"],
-                        Util.HexStringToBuffer(authDescriptor["args"])
+                        Util.StringToAuthType((string) authDescriptor["type"]),
+                        Util.HexStringToBuffer((string) authDescriptor["args"])
                     )
                 );
             }
@@ -163,10 +164,13 @@ namespace Chromia.Postchain.Ft3
             return acc;
         }
 
-        public async void AddAuthDescriptor(AuthDescriptor authDescriptor)
+        public async Task AddAuthDescriptor(AuthDescriptor authDescriptor)
         {
-            await this.Session.Call(AddAuthDescriptorOp(authDescriptor).ToArray());
-            this.AuthDescriptor.Add(authDescriptor);
+            var response = await this.Session.Call(AddAuthDescriptorOp(authDescriptor).ToArray());
+            // Op was successful
+            if(response == null) {
+                this.AuthDescriptor.Add(authDescriptor);
+            }
         }
 
         public async Task DeleteAllAuthDescriptorsExclude(AuthDescriptor authDescriptor)
@@ -185,21 +189,22 @@ namespace Chromia.Postchain.Ft3
 
         public AssetBalance GetAssetById(byte[] id)
         {
-            return this.Assets.Find(assetBalance => assetBalance.Asset.GetId().Equals(id));
+            return this.Assets.Find(assetBalance => Util.ByteArrayToString(assetBalance.Asset.GetId()).Equals(Util.ByteArrayToString(id)));
         }
 
-        public async Task TransferInputsToOutputs(List<dynamic> inputs, List<dynamic> outputs)
+        public async Task TransferInputsToOutputs(dynamic[] inputs, dynamic[] outputs)
         {
             var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
+
             transactionBuilder.AddOperation("ft3.transfer", inputs, outputs);
-            transactionBuilder.AddOperation("nop", new Random().Next().ToString());
+            // transactionBuilder.AddOperation("nop", new Random().Next().ToString());
             var tx = transactionBuilder.Build(this.Session.User.AuthDescriptor.GetSigners());
             tx.Sign(this.Session.User.KeyPair);
             await tx.Post();
             await this.SyncAssets();
         }
 
-        public async void Transfer(byte[] accountId, byte[] assetId, float amount)
+        public async Task Transfer(byte[] accountId, byte[] assetId, int amount)
         {
             var input = new List<dynamic>{
                 this.Id,
@@ -207,19 +212,22 @@ namespace Chromia.Postchain.Ft3
                 this.AuthDescriptor[0].Hash(),
                 amount,
                 new dynamic[] {}
-            };
+            }.ToArray();
 
             var output = new List<dynamic>{
                 accountId,
                 assetId,
                 amount,
                 new dynamic[] {}
-            };
+            }.ToArray();
 
-            await this.TransferInputsToOutputs(input, output);
+            await this.TransferInputsToOutputs(
+                new List<dynamic>(){input}.ToArray(),
+                new List<dynamic>(){output}.ToArray()
+            );
         }
 
-        public async void BurnTokens(byte[] assetId, float amount)
+        public async Task BurnTokens(byte[] assetId, int amount)
         {
             var input = new List<dynamic>(){
                 this.Id,
@@ -227,9 +235,12 @@ namespace Chromia.Postchain.Ft3
                 this.AuthDescriptor[0].Hash(),
                 amount,
                 new dynamic[] {}
-            };
+            }.ToArray();
 
-            await this.TransferInputsToOutputs(input, new List<dynamic>{});
+            await this.TransferInputsToOutputs(
+                new List<dynamic>(){input}.ToArray(),
+                new List<dynamic>(){}.ToArray()
+            );
         }
 
         public async Task<dynamic> GetPaymentHistory()
@@ -247,7 +258,7 @@ namespace Chromia.Postchain.Ft3
             return this._paymentHistorySyncManager.PaymentHistoryStore.GetIterator(this.Id, pageSize);
         }
 
-        public async Task XcTransfer(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, float amount)
+        public async Task XcTransfer(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, int amount)
         {
             var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
             transactionBuilder.AddOperation(XcTransferOp(destinationChainId, destinationAccountId, assetId, amount));
@@ -259,7 +270,7 @@ namespace Chromia.Postchain.Ft3
         }
 
         /* Operation and query */
-        public dynamic[] XcTransferOp(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, float amount)
+        public dynamic[] XcTransferOp(byte[] destinationChainId, byte[] destinationAccountId, byte[] assetId, int amount)
         {
             var gtv = new List<dynamic>() {
                 "ft3.xc.init_xfer",
@@ -297,7 +308,7 @@ namespace Chromia.Postchain.Ft3
         {
             var gtv = new List<dynamic>() {
                 "ft3.dev_register_account",
-                authDescriptor.ToGTV()
+                authDescriptor
             };
 
             return gtv.ToArray();

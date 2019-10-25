@@ -7,7 +7,7 @@ public class AccountBuilder
 {
     private Blockchain _blockchain;
     private User _user;
-    private float _balance = -1f;
+    private int _balance = -1;
     private Asset _asset;
     private List<KeyPair> _participants = new List<KeyPair>(){new KeyPair()};
     private int _requiredSignaturesCount = 1;
@@ -42,7 +42,7 @@ public class AccountBuilder
         return this;
     }
 
-    public AccountBuilder WithBalance(Asset asset, float balance)
+    public AccountBuilder WithBalance(Asset asset, int balance)
     {
         this._asset = asset;
         this._balance = balance;
@@ -72,7 +72,7 @@ public class AccountBuilder
 
     private async Task AddBalanceIfNeeded(Account account)
     {
-        if(this._asset != null && this._balance != -1f)
+        if(this._asset != null && this._balance != -1)
         {
             await AssetBalance.GiveBalance(account.Id, this._asset.GetId(), this._balance, this._blockchain);
         }

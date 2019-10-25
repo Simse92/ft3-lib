@@ -66,6 +66,7 @@ function process_transfer_output (o: xfer_output, idx: integer, available_assets
 }
 
 operation transfer (inputs: list<xfer_input>, outputs: list<xfer_output>) {
+	print(inputs);
    val sum_inputs = map<asset, integer>();
    var idx = 0;
    for (i in inputs) {

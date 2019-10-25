@@ -1,4 +1,4 @@
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client.GTV;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -49,7 +49,7 @@ namespace Chromia.Postchain.Ft3
                     this.Flags.ToGTV(),
                     this.SignatureRequired,
                     hexPubs.ToArray()
-                }
+                }.ToArray()
             };
             return gtv.ToArray();
         }
@@ -71,10 +71,10 @@ namespace Chromia.Postchain.Ft3
                     this.Flags.ToGTV(),
                     this.SignatureRequired,
                     hexPubs.ToArray()
-                }
-            };
+                }.ToArray()
+            }.ToArray();
 
-            return Gtx.ArgToGTXValue(gtv).Encode();
+            return Gtv.Hash(gtv);
         }
     }
 }

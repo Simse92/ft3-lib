@@ -16,7 +16,7 @@ namespace Chromia.Postchain.Ft3
         public static XTransferOperation From(dynamic rawTransfer)
         {
             var rawSource = rawTransfer["args"][0];
-            var source = new TransferParam((string) rawSource[0], (string) rawSource[1], (float) rawSource[3]);
+            var source = new TransferParam((string) rawSource[0], (string) rawSource[1], (int) rawSource[3]);
             var target = new XTransferTarget((string) rawTransfer["args"][1][0]);
             var hops = rawTransfer["args"][2];
 
