@@ -24,15 +24,24 @@ namespace Chromia.Postchain.Ft3
         public async Task SyncAccount(byte[] id, Blockchain blockchain)
         {
             var syncInfo = this.PaymentHistoryStore.GetSyncInfo(id);
-            int lastBlock = (int) syncInfo["lastBlock"];
+            int lastBlock = -1;
+
+            if(syncInfo != null) 
+            {
+                lastBlock = (int) syncInfo["lastBlock"];
+            }
+            
 
             PaymentHistoryEntryShort[] paymentHistory = await PaymentHistory.GetAccountById(id, blockchain.Connection, lastBlock);
             if(paymentHistory.Length == 0) return;
-
+            
             //Add missing sender/receiver info to payment history entries
             PaymentHistoryEntry[] paymentHistoryEntries = this.MapShortEntriesToLongEntries(paymentHistory, blockchain.Id, id);
+            
             this.PaymentHistoryStore.Save(id, paymentHistoryEntries);
-            syncInfo["lastBlock"] = this.GetHighestBlock(paymentHistoryEntries, lastBlock);
+            var highestBlock = this.GetHighestBlock(paymentHistoryEntries, lastBlock);
+            Console.WriteLine("highestBlock: " + highestBlock);
+            syncInfo["lastBlock"] = highestBlock;
             this.PaymentHistoryStore.SaveSyncInfo(id, syncInfo);
         }
 
@@ -43,8 +52,12 @@ namespace Chromia.Postchain.Ft3
 
             foreach (var value in entriesMap.Values)
             {
-                paymentHistoryEntries.Add(this.PaymentHistoryEntriesFrom(entries, chainId, accountId));
+                paymentHistoryEntries.Add(this.PaymentHistoryEntriesFrom(value, chainId, accountId));
             }
+
+            System.Console.WriteLine("TEST");
+            System.Console.WriteLine(paymentHistoryEntries.Count);
+
             return paymentHistoryEntries.SelectMany(x => x).Reverse().ToArray();
         }
 
@@ -68,7 +81,7 @@ namespace Chromia.Postchain.Ft3
 
         private PaymentHistoryEntry[] PaymentHistoryEntriesFrom(PaymentHistoryEntryShort[] entries, byte[] chainId, byte[] accountId)
         {
-            if(entries.Length == 1) return new PaymentHistoryEntry[] {};
+            if(entries.Length == 0) return new PaymentHistoryEntry[] {};
 
             PaymentHistoryEntryShort firstEntry = entries[0];
 

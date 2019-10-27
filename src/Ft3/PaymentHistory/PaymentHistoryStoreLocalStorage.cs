@@ -42,9 +42,12 @@ namespace Chromia.Postchain.Ft3
         public dynamic GetSyncInfo(byte[] accountId)
         {
             string key = "FT3_LIB_P_H_S_I_" + Util.ByteArrayToString(accountId).ToUpper();
-            dynamic value = _localStorage.Get(key);
-
-            if(value == null)
+            dynamic value;
+            try
+            {
+                value = _localStorage.Get(key);
+            }
+            catch(ArgumentNullException)
             {
                 return null;
             }
@@ -77,8 +80,12 @@ namespace Chromia.Postchain.Ft3
         private PaymentHistoryEntry[] LoadFromStore(byte[] id)
         {
             string key = "FT3_LIB_P_H_" + Util.ByteArrayToString(id).ToUpper();
-            var value = _localStorage.Get(key);
-            if(value == null)
+            dynamic value;
+            try
+            {
+                value = _localStorage.Get(key);
+            }
+            catch(ArgumentNullException)
             {
                 return new PaymentHistoryEntry[]{};
             }

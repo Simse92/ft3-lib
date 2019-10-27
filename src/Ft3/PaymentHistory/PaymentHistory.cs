@@ -12,7 +12,9 @@ namespace Chromia.Postchain.Ft3
                 ("account_id", Util.ByteArrayToString(id)),
                 ("after_block", afterBlock)
             );
-
+            
+            System.Console.WriteLine("PaymentHistory: " + paymentHistoryEntriesQuery);
+            
             var paymentHistoryEntriesList = new List<PaymentHistoryEntryShort>();
 
             foreach (var entry in paymentHistoryEntriesQuery)
