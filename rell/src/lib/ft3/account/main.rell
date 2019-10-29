@@ -30,7 +30,6 @@ class auth_descriptor_participant {
 }
 
 function _add_auth_descriptor (account, auth_descriptor) {
-	print("hallo: " + auth_descriptor.args.to_gtv());
      val descriptor_id = auth_descriptor.hash();
      val account_auth_descriptor = create account_auth_descriptor (
         account, descriptor_id,
@@ -76,7 +75,6 @@ operation delete_all_auth_descriptors_exclude(account_id: byte_array, auth_descr
 }
 
 operation add_auth_descriptor (account_id: byte_array, auth_id: byte_array, new_desc: auth_descriptor) {
-      print("HALLO");
       print(account_id);
       var accounts = account @*{};
       for(acc in accounts)
@@ -97,8 +95,6 @@ query get_account_auth_descriptors(id: byte_array) {
         type = .auth_type,
         args = .args
     );
-    
-    print(gtv.from_bytes(user[0].args));
     
     return user;
 }

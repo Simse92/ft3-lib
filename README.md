@@ -1,1 +1,1 @@
-# ft3-lib
+# FT3 Client API C#
