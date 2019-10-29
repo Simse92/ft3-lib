@@ -1,5 +1,7 @@
 using Chromia.Postchain.Client.GTX;
 using Chromia.Postchain.Client.GTX.ASN1Messages;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -16,23 +18,27 @@ namespace Chromia.Postchain.Ft3
 
         public PaymentOperation[] Extract()
         {
-            System.Console.WriteLine("PaymentOperationExtractor: " + Util.ByteArrayToString(this._transaction));
-
+            List<PaymentOperation> paymentOperations = new List<PaymentOperation>();
             GTXValue value = Gtx.Deserialize(this._transaction);
+            dynamic[] transaction = value.Array[0].ToDynamicArray();
+                        
+            foreach (var operation in transaction[1])
+            {
+                if(((string) operation[0]).Equals("ft3.transfer"))
+                {
+                    paymentOperations.Add(
+                        PaymentOperation.FromTransfer(TransferOperation.From(operation), this._chainId)
+                    );
+                }
+                else if(((string) operation[0]).Equals("ft3.xc.init_xfer"))
+                {
+                    paymentOperations.Add(
+                        PaymentOperation.FromXTransfer(XTransferOperation.From(operation), this._chainId)
+                    );
+                }
+            }           
 
-
-            // System.Console.WriteLine("Val1");
-            // System.Console.WriteLine(value.Array[0]);
-            // System.Console.WriteLine("Val2");
-            // System.Console.WriteLine(value.Array[1]);
-            
-            // Todo Not Supported
-            // var transaction = gtx.deserialize(this.transaction);
-            // GTXValue value = null;
-
-            
-
-            return null;
+            return paymentOperations.ToArray();
         }
     }
 }

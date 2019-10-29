@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Chromia.Postchain.Ft3
 {
     public class XTransferOperation
@@ -15,12 +17,35 @@ namespace Chromia.Postchain.Ft3
 
         public static XTransferOperation From(dynamic rawTransfer)
         {
-            var rawSource = rawTransfer["args"][0];
-            var source = new TransferParam((string) rawSource[0], (string) rawSource[1], (int) rawSource[3]);
-            var target = new XTransferTarget((string) rawTransfer["args"][1][0]);
-            var hops = rawTransfer["args"][2];
+            var transfer = rawTransfer[1];
+            var hops = new List<string>();
+            var source = new TransferParam(Util.ByteArrayToString(transfer[0][0]), Util.ByteArrayToString(transfer[0][1]), (int) transfer[0][3]);
+            var target = new XTransferTarget(Util.ByteArrayToString(transfer[1][0]));
 
-            return new XTransferOperation(source, target, hops);
+            foreach (var hop in transfer[2])
+            {
+                hops.Add(Util.ByteArrayToString(hop));
+            }
+
+            return new XTransferOperation(source, target, hops.ToArray());
         }
     }
 }
+
+    // var inputs = new List<TransferParam>();
+    //         var outputs = new List<TransferParam>();
+
+    //         foreach (var input in rawTransfer[1][0])
+    //         {
+    //             inputs.Add(
+    //                 new TransferParam(Util.ByteArrayToString(input[0]), Util.ByteArrayToString(input[1]), (int) input[3])
+    //             );
+    //         }
+
+    //         foreach (var input in rawTransfer[1][1])
+    //         {
+    //             outputs.Add(
+    //                 new TransferParam(Util.ByteArrayToString(input[0]), Util.ByteArrayToString(input[1]), (int) input[2])
+    //             );
+    //         }
+    //        return new TransferOperation(inputs, outputs);

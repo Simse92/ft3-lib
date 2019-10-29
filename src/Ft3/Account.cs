@@ -56,6 +56,7 @@ namespace Chromia.Postchain.Ft3
         List<byte[]> GetSigners();
         byte[] GetId();
         dynamic[] ToGTV();
+        List<byte[]> GetPubKey();
     }
 
     public class Account

@@ -17,7 +17,6 @@ namespace Chromia.Postchain.Ft3
         public static async Task<List<AssetBalance>> GetByAccountId(byte[] id, Blockchain blockchain)
         {
             var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_balances", ("account_id", Util.ByteArrayToString(id)));
-            System.Console.WriteLine("Assets" + assets);
             List<AssetBalance> assetsBalances = new List<AssetBalance>();
 
             foreach (var asset in assets)

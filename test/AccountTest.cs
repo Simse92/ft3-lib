@@ -166,9 +166,9 @@ public class UserTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         Account account = await accountBuilder.Build();
-
         Account[] accounts = await Account.GetByParticipantId(user.KeyPair.PubKey, blockchain.NewSession(user));
         Assert.Equal(1, accounts.Length);
+        Assert.Equal(Util.ByteArrayToString(user.KeyPair.PubKey), Util.ByteArrayToString(accounts[0].AuthDescriptor[0].GetPubKey()[0]));
     }
 
     // should return two accounts when account is participant of two accounts

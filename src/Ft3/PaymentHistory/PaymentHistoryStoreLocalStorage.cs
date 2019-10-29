@@ -39,7 +39,7 @@ namespace Chromia.Postchain.Ft3
             return entries.ToList().GetRange(start, Math.Min(entries.Length, start + pageSize)).ToArray();
         }
 
-        public dynamic GetSyncInfo(byte[] accountId)
+        public Dictionary<string, dynamic> GetSyncInfo(byte[] accountId)
         {
             string key = "FT3_LIB_P_H_S_I_" + Util.ByteArrayToString(accountId).ToUpper();
             dynamic value;
@@ -49,13 +49,12 @@ namespace Chromia.Postchain.Ft3
             }
             catch(ArgumentNullException)
             {
-                return null;
+                return new Dictionary<string, dynamic>();
             }
-
-            return JsonConvert.DeserializeObject(value);
+            return JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(value);
         }
 
-        public void SaveSyncInfo(byte[] accountId, dynamic syncInfo)
+        public void SaveSyncInfo(byte[] accountId, Dictionary<string, dynamic> syncInfo)
         {
             string key = "FT3_LIB_P_H_S_I_" + Util.ByteArrayToString(accountId).ToUpper();
             var value = JsonConvert.SerializeObject(syncInfo);
@@ -68,7 +67,7 @@ namespace Chromia.Postchain.Ft3
             string accountIdString = Util.ByteArrayToString(accountId).ToUpper();
             PaymentHistoryEntry[] entries = this._entriesCache[accountIdString];
 
-            if(entries != null)
+            if(entries == null)
             {
                 entries = this.LoadFromStore(accountId);
                 this._entriesCache[accountIdString] = entries;

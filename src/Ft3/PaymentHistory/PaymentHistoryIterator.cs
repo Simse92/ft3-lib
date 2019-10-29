@@ -18,7 +18,7 @@ namespace Chromia.Postchain.Ft3
 
         public int GetPageCount()
         {
-            return (int) Math.Ceiling((double) (this._paymentHistoryStore.GetCount(this.AccountId) / this.PageSize));
+            return (int) Math.Ceiling((double) this._paymentHistoryStore.GetCount(this.AccountId) / (double) this.PageSize);
         }
 
         public int GetTotalCount()

@@ -23,14 +23,17 @@ namespace Chromia.Postchain.Ft3
 
         public async Task SyncAccount(byte[] id, Blockchain blockchain)
         {
-            var syncInfo = this.PaymentHistoryStore.GetSyncInfo(id);
+            Dictionary<string, dynamic> syncInfo = this.PaymentHistoryStore.GetSyncInfo(id);
             int lastBlock = -1;
 
-            if(syncInfo != null) 
+            if(syncInfo.Count == 0) 
+            {
+                syncInfo.Add("lastBlock", lastBlock);
+            }
+            else
             {
                 lastBlock = (int) syncInfo["lastBlock"];
             }
-            
 
             PaymentHistoryEntryShort[] paymentHistory = await PaymentHistory.GetAccountById(id, blockchain.Connection, lastBlock);
             if(paymentHistory.Length == 0) return;
@@ -40,7 +43,7 @@ namespace Chromia.Postchain.Ft3
             
             this.PaymentHistoryStore.Save(id, paymentHistoryEntries);
             var highestBlock = this.GetHighestBlock(paymentHistoryEntries, lastBlock);
-            Console.WriteLine("highestBlock: " + highestBlock);
+
             syncInfo["lastBlock"] = highestBlock;
             this.PaymentHistoryStore.SaveSyncInfo(id, syncInfo);
         }
@@ -55,9 +58,6 @@ namespace Chromia.Postchain.Ft3
                 paymentHistoryEntries.Add(this.PaymentHistoryEntriesFrom(value, chainId, accountId));
             }
 
-            System.Console.WriteLine("TEST");
-            System.Console.WriteLine(paymentHistoryEntries.Count);
-
             return paymentHistoryEntries.SelectMany(x => x).Reverse().ToArray();
         }
 
@@ -69,13 +69,16 @@ namespace Chromia.Postchain.Ft3
             {  
                 if(entriesGroups.ContainsKey(entry.TransactionId))
                 {
-                    entriesGroups[entry.TransactionId].ToList().Add(entry);
+                    var concatList = entriesGroups[entry.TransactionId].ToList();
+                    concatList.Add(entry);
+                    entriesGroups[entry.TransactionId] = concatList.ToArray();
                 }
                 else
                 {
                     entriesGroups.Add(entry.TransactionId, new List<PaymentHistoryEntryShort>() {entry}.ToArray());
                 }
             }
+            
             return entriesGroups;
         }
 
@@ -105,7 +108,6 @@ namespace Chromia.Postchain.Ft3
                                                     ).ToList().Select(output => new ParamPaymentPair(output, payment))
             ).SelectMany(x => x).ToArray();
 
-
             //TODO: investigate if this check has to be removed, because lib might me used with new FT3 contract which
             //maybe has new transfer type, which adds payment history entries, but transfer is not supported by this version
             //of the client lib and it will not be loaded, and in the and number of inputs and outputs will not match
@@ -130,7 +132,7 @@ namespace Chromia.Postchain.Ft3
                     ParamPaymentPair input = this.MatchPaymentHistoryEntryAndPaymentParam(entry, inputs, accountId);
                     if(input == null) throw new Exception("Cannot match payment history entry to any transfer input");
 
-                    inputs = inputs.ToList().Where(i => i.Equals(input)).ToArray();
+                    inputs = inputs.ToList().Where(i => !i.Equals(input)).ToArray();
                     paymentHistoryEntries.Add(this.GetPaymentHistoryEntry(entry, input.Payment));
                 }
                 else
@@ -138,7 +140,7 @@ namespace Chromia.Postchain.Ft3
                     ParamPaymentPair output = this.MatchPaymentHistoryEntryAndPaymentParam(entry, outputs, accountId);
                     if(output == null) throw new Exception("Cannot match payment history entry to any transfer output");
 
-                    outputs = outputs.ToList().Where(o => o.Equals(output)).ToArray();
+                    outputs = outputs.ToList().Where(o => !o.Equals(output)).ToArray();
                     paymentHistoryEntries.Add(this.GetPaymentHistoryEntry(entry, output.Payment));
                 }
             }
@@ -158,10 +160,15 @@ namespace Chromia.Postchain.Ft3
 
         private PaymentHistoryEntry GetPaymentHistoryEntry(PaymentHistoryEntryShort entry, PaymentOperation payment)
         {
-            dynamic other = entry.IsInput 
-                ? payment.OutputsWithAsset(entry.AssetId).Select((chainId, accountId) => (chainId, accountId))
-                : payment.InputsWithAsset(entry.AssetId).Select((chainId, accountId) => (chainId, accountId));
-
+            dynamic other;
+            if(entry.IsInput)
+            {
+                other = payment.OutputsWithAsset(entry.AssetId).Select(id => new dynamic[] {id.ChainId, id.AccountId}).ToArray();
+            }
+            else
+            {
+                other = payment.InputsWithAsset(entry.AssetId).Select(id => new dynamic[]{id.ChainId, id.AccountId}).ToArray();
+            }
 
             return new PaymentHistoryEntry(
                 entry.IsInput,

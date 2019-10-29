@@ -17,9 +17,7 @@ namespace Chromia.Postchain.Ft3
 
         private SingleSignatureAuthDescriptor CreateSingleSig(byte[] args)
         {   
-            // ToDo
             var decodedDescriptor = Gtx.Deserialize(args);
-            //dynamic[] decodedDescriptor = {};
             var flags = new List<FlagsType>();
 
             foreach (var flag in decodedDescriptor.Array[0].Array)

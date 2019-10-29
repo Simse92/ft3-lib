@@ -11,13 +11,18 @@ namespace Chromia.Postchain.Ft3
 
         public SingleSignatureAuthDescriptor(byte[] pubKey, FlagsType[] flags)
         {
-            this.Flags = new Flags(flags.ToList());
             this.PubKey = pubKey;
+            this.Flags = new Flags(flags.ToList());
         }
 
         public List<byte[]> GetSigners()
         {
             return new List<byte[]>(){this.PubKey};
+        }
+
+        public List<byte[]> GetPubKey()
+        {
+            return new List<byte[]>() {this.PubKey};
         }
 
         public byte[] GetId()

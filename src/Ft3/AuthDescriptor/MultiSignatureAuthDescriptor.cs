@@ -28,6 +28,12 @@ namespace Chromia.Postchain.Ft3
             return this.PubKeys;
         }
 
+        public List<byte[]> GetPubKey()
+        {
+            return this.PubKeys;
+        }
+
+
         public byte[] GetId()
         {
             return this.Hash();

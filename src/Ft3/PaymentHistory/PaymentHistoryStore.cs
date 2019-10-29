@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Chromia.Postchain.Ft3
 {
     public interface PaymentHistoryStore
@@ -6,8 +8,7 @@ namespace Chromia.Postchain.Ft3
         PaymentHistoryIterator GetIterator(byte[] accountId, int pageSize);
         void Save(byte[] accountId, PaymentHistoryEntry[] paymentHistoryEntries);
         PaymentHistoryEntry[] GetEntries(byte[] accountId, int start, int pageSize);
-        dynamic GetSyncInfo(byte[] accountId);
-        void SaveSyncInfo(byte[] accountId, dynamic syncInfo);
+        Dictionary<string, dynamic> GetSyncInfo(byte[] accountId);
+        void SaveSyncInfo(byte[] accountId, Dictionary<string, dynamic> syncInfo);
     }
-
 }

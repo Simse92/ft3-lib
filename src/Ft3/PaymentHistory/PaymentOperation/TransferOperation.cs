@@ -19,20 +19,19 @@ namespace Chromia.Postchain.Ft3
             var inputs = new List<TransferParam>();
             var outputs = new List<TransferParam>();
 
-            foreach (var input in rawTransfer["args"][0])
+            foreach (var input in rawTransfer[1][0])
             {
                 inputs.Add(
-                    new TransferParam((string) input[0], (string) input[1], (int) input[3])
+                    new TransferParam(Util.ByteArrayToString(input[0]), Util.ByteArrayToString(input[1]), (int) input[3])
                 );
             }
 
-            foreach (var input in rawTransfer["args"][1])
+            foreach (var input in rawTransfer[1][1])
             {
                 outputs.Add(
-                    new TransferParam((string) input[0], (string) input[1], (int) input[2])
+                    new TransferParam(Util.ByteArrayToString(input[0]), Util.ByteArrayToString(input[1]), (int) input[2])
                 );
             }
-        
            return new TransferOperation(inputs, outputs);
         }
     }
