@@ -5,17 +5,17 @@ namespace Chromia.Postchain.Ft3
 {
     public class TransactionBuilder
     {
-        private List<dynamic> _operations;
+        private List<Operation> _operations;
         public readonly Blockchain Blockchain;
         public TransactionBuilder(Blockchain blockchain)
         {
             this.Blockchain = blockchain;
-            _operations = new List<dynamic>();
+            _operations = new List<Operation>();
         }
 
-        public TransactionBuilder AddOperation(params dynamic[] args)
+        public TransactionBuilder AddOperation(Operation operation)
         {
-            this._operations.Add(ToGTV(args));
+            this._operations.Add(operation);
             return this;
         }
 
@@ -64,12 +64,16 @@ namespace Chromia.Postchain.Ft3
             var tx = this.Blockchain.Connection.Gtx.NewTransaction(signers.ToArray());
             foreach (var operation in this._operations)
             {
-                var type = (string) operation[0];
-                operation.Remove(operation[0]);
-
-                tx.AddOperation(type, operation.ToArray());
+                tx.AddOperation(operation.Name, ToGTV(operation.Args).ToArray());
             }
             return new Transaction(tx, this.Blockchain);
+        }
+
+        public Transaction BuildAndSign(User user)
+        {
+            var tx = this.Build(user.AuthDescriptor.GetSigners());
+            tx.Sign(user.KeyPair);
+            return tx;
         }
     }
 }

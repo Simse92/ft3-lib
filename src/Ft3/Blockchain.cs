@@ -107,14 +107,20 @@ namespace Chromia.Postchain.Ft3
             return await this.Connection.Query(name, queryObject);
         }
 
-        public async Task<dynamic> Call(User user, params dynamic[] args)
+        public async Task<dynamic> Call(Operation operation, User user)
         {
             var txBuilder = this.CreateTransactionBuilder();
-            txBuilder.AddOperation(args);
+            txBuilder.AddOperation(operation);
             var tx = txBuilder.Build(user.AuthDescriptor.GetSigners());
             tx.Sign(user.KeyPair);
             return await tx.Post();
         }
+
+        // public void PostRaw(byte[] rawTransaction)
+        // {
+        //     // const tx = this.connection.gtx.transactionFromRawTransaction(rawTransaction);
+        //     //  await tx.postAndWaitConfirmation();
+        // }
 
         public TransactionBuilder CreateTransactionBuilder()
         {

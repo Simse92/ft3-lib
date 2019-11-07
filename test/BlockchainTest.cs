@@ -14,7 +14,7 @@ public class BlockchainTest
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
         BlockchainInfo info = await BlockchainInfo.GetInfo(blockchain.Connection);
 
-        Assert.Equal(info.Name, "FT3-demo-app");
+        Assert.Equal(info.Name, "ChromaToken");
     }
 
     // should be able to register an account

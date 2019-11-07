@@ -1,6 +1,4 @@
 //namespace ft3 {
-include "account/main";
-
   class asset {
     id: byte_array;
     key id;
@@ -26,13 +24,17 @@ include "account/main";
    return create asset (id, name, issuing_chain_rid);
   }
 
-  query get_asset_balances(account_id: byte_array) {
+  function _get_asset_balances(account_id: byte_array): list<(id:byte_array,name:text,amount:integer,chain_id:byte_array)> {
     return balance @* { .account.id == account_id } (
-        id = .asset.id,
-        name = .asset.name,
-        amount = .amount,
-        chain_id = .asset.issuing_chain_rid
+      id = .asset.id,
+      name = .asset.name,
+      amount = .amount,
+      chain_id = .asset.issuing_chain_rid
     );
+  }
+
+  query get_asset_balances(account_id: byte_array) {
+    return _get_asset_balances(account_id);
   }
 
   query get_asset_balance(account_id: byte_array, asset_id: byte_array) {

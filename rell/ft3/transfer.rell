@@ -39,7 +39,7 @@ function consume_input (i: xfer_input, idx: integer, assets: map<asset, integer>
       );
 }
 
-function process_transfer_output (o: xfer_output, idx: integer, available_assets: map<asset, integer>) {
+function process_transfer_output (o: xfer_output, idx: integer, available_assets: map<asset, integer>): payment_history_entry {
       if (o.extra.contains("reg_auth_desc")) {
           val auth_desc = auth_descriptor.from_gtv(o.extra["reg_auth_desc"]);
           require(o.account_id
@@ -54,7 +54,7 @@ function process_transfer_output (o: xfer_output, idx: integer, available_assets
       val balance = ensure_balance(target_account, asset);
       balance.amount += o.amount;
 
-      create payment_history_entry (
+      return create payment_history_entry (
         .account = target_account,
         asset,
         .delta = o.amount,
@@ -65,8 +65,7 @@ function process_transfer_output (o: xfer_output, idx: integer, available_assets
       );
 }
 
-operation transfer (inputs: list<xfer_input>, outputs: list<xfer_output>) {
-	print(inputs);
+function _transfer (inputs: list<xfer_input>, outputs: list<xfer_output>) {
    val sum_inputs = map<asset, integer>();
    var idx = 0;
    for (i in inputs) {
@@ -79,7 +78,10 @@ operation transfer (inputs: list<xfer_input>, outputs: list<xfer_output>) {
       process_transfer_output(o, idx, sum_inputs);
       idx += 1;
    }
-   
+}
+
+operation transfer (inputs: list<xfer_input>, outputs: list<xfer_output>) {
+    _transfer(inputs, outputs);
 }
 
  

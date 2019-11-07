@@ -163,6 +163,7 @@ public class PaymentHistoryIteratorTest
         Assert.Equal(Util.ByteArrayToString(accountId2), entry1.Other[0][1]);
     }   
 
+    //should have two payment history entries if one crosschain transfer and one transfer is made
     [Fact(Skip = "Working")]
     public async void PaymentHistoryIteratorTestRun6()
     {
@@ -180,11 +181,10 @@ public class PaymentHistoryIteratorTest
         Account account2 = await accountBuilder2.Build();
 
         await account1.Transfer(account2.Id, asset.GetId(), 10);  
+        await account1.XcTransfer(TestUtil.GenerateId(), TestUtil.GenerateId(), asset.GetId(), 11);
 
         PaymentHistoryIterator paymentHistoryIterator = await account1.GetPaymentHistoryIterator(5);
         PaymentHistoryEntry[] paymentHistoryEntries = paymentHistoryIterator.Next();
-
-        await account1.XcTransfer(TestUtil.GenerateId(), TestUtil.GenerateId(), asset.GetId(), 11);
 
         Assert.Equal(1, paymentHistoryIterator.GetPageCount());
         Assert.Equal(2, paymentHistoryEntries.Length);

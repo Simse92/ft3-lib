@@ -31,6 +31,8 @@ class auth_descriptor_participant {
 
 function _add_auth_descriptor (account, auth_descriptor) {
      val descriptor_id = auth_descriptor.hash();
+     
+     print("Descriptor ID: " + descriptor_id);
      val account_auth_descriptor = create account_auth_descriptor (
         account, descriptor_id,
         auth_descriptor.auth_type,
@@ -75,28 +77,20 @@ operation delete_all_auth_descriptors_exclude(account_id: byte_array, auth_descr
 }
 
 operation add_auth_descriptor (account_id: byte_array, auth_id: byte_array, new_desc: auth_descriptor) {
-      print(account_id);
-      var accounts = account @*{};
-      for(acc in accounts)
-      {
-      	print(acc.id);
-      }
-      
       val account = account @ { .id == account_id };
+      print("authId: " + auth_id);
       require_auth(account, auth_id, ["A"]);
       _add_auth_descriptor(account, new_desc);
 }
 
 query get_account_auth_descriptors(id: byte_array) {
- val user = account_auth_descriptor @* {
+    return account_auth_descriptor @* {
         .account.id == id
     } (
         id = .descriptor_id,
         type = .auth_type,
         args = .args
     );
-    
-    return user;
 }
 
 query get_account_by_id(id: byte_array) {

@@ -40,12 +40,13 @@ public class UserTest
         Account account = await Account.Register(user.AuthDescriptor, blockchain.NewSession(user));
         Assert.NotNull(account);
 
-        await account.AddAuthDescriptor(
-            new SingleSignatureAuthDescriptor(
+        AuthDescriptor authDescriptor = new SingleSignatureAuthDescriptor(
                 user.KeyPair.PubKey,
                 new List<FlagsType>(){FlagsType.Transfer}.ToArray()
-            )
         );
+        System.Console.WriteLine("Def Descriptor ID: " + Util.ByteArrayToString(user.AuthDescriptor.GetId()));
+        System.Console.WriteLine("Add Descriptor ID: " + Util.ByteArrayToString(authDescriptor.GetId()));
+        await account.AddAuthDescriptor(authDescriptor);
         Assert.Equal(2, account.AuthDescriptor.Count);
     }
 
@@ -96,7 +97,7 @@ public class UserTest
     }
 
     // should update account if 2 signatures provided
-    [Fact(Skip = "Not Working not all signatures provided")]
+    [Fact(Skip = "Not Working")]
     public async void AccountTest6()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
@@ -115,13 +116,11 @@ public class UserTest
         );
 
         Assert.NotNull(account);
-
-        await account.AddAuthDescriptor(
-            new SingleSignatureAuthDescriptor(
+        AuthDescriptor authDescriptor = new SingleSignatureAuthDescriptor(
                 user1.KeyPair.PubKey,
                 new List<FlagsType>(){FlagsType.Transfer}.ToArray()
-            )
         );
+        await account.AddAuthDescriptor(authDescriptor);
 
         Assert.Equal(2, account.AuthDescriptor.Count);
     }
@@ -240,5 +239,25 @@ public class UserTest
 
         Account foundAccount = await blockchain.NewSession(user1).GetAccountById(account.Id);
         Assert.Equal(1, foundAccount.AuthDescriptor.Count);
+    }
+
+    // should be able to register account by directly calling \'register_account\' operation
+    [Fact(Skip = "Working")]
+    public async void AccountTest12()
+    {
+        Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
+
+        User user = TestUser.SingleSig();
+
+        await blockchain.Call(AccountOperations.Op("ft3.dev_register_account", new List<dynamic>() {
+            user.AuthDescriptor
+        }.ToArray()
+        )
+        , user);
+    
+        BlockchainSession session = blockchain.NewSession(user);
+        Account account = await session.GetAccountById(user.AuthDescriptor.GetId());
+
+        Assert.NotNull(account);
     }
 }

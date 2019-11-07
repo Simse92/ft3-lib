@@ -34,9 +34,9 @@ namespace Chromia.Postchain.Ft3
             return await this.Blockchain.Query(name, queryObject);
         }
 
-        public async Task<dynamic> Call(params dynamic[] args)
+        public async Task<dynamic> Call(Operation operation)
         {
-            return await this.Blockchain.Call(this.User, args);
+            return await this.Blockchain.Call(operation, this.User);
         }
     }
 }
