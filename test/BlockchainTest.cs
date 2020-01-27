@@ -4,7 +4,7 @@ using Xunit;
 
 public class BlockchainTest
 {
-    const string chainId = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+    const string chainId = "6539EC234FC62BE2B3F6C8B391FC4BBAA75455DAEF1F32CD0D3674BADEE8F19F";
     const string nodeUrl = "http://localhost:7740";
 
     // should provide info
@@ -13,12 +13,11 @@ public class BlockchainTest
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
         BlockchainInfo info = await BlockchainInfo.GetInfo(blockchain.Connection);
-
-        Assert.Equal(info.Name, "ChromaToken");
+        Assert.Equal(info.Name, "test");
     }
 
     // should be able to register an account
-    [Fact(Skip = "Working")]
+    [Fact]
     public async void BlockchainTestRun2()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);

@@ -12,6 +12,7 @@ public class AccountBuilder
     private List<KeyPair> _participants = new List<KeyPair>(){new KeyPair()};
     private int _requiredSignaturesCount = 1;
     private List<FlagsType> _flags = new List<FlagsType>(){FlagsType.Account, FlagsType.Transfer};
+    private int _points = 0;
 
 
     public AccountBuilder(Blockchain blockchain, User user)
@@ -22,8 +23,11 @@ public class AccountBuilder
         }
 
         this._blockchain = blockchain;
+        this._participants = new List<KeyPair>(){user.KeyPair};
         this._user = user;
     }
+
+    /* Public functions */
 
     public static AccountBuilder CreateAccountBuilder(Blockchain blockchain, User user = null)
     {
@@ -49,6 +53,12 @@ public class AccountBuilder
         return this;
     }
 
+    public AccountBuilder WithPoints(int points)
+    {
+        this._points = points;
+        return this;
+    }
+
     public AccountBuilder WithRequiredSignatures(int count)
     {
         this._requiredSignaturesCount = count;
@@ -59,8 +69,11 @@ public class AccountBuilder
     {
         var account = await this.RegisterAccount();
         await this.AddBalanceIfNeeded(account);
+        account.RateLimit = await this.AddPointsIfNeeded(account);
         return account;
     }
+
+     /* Private functions */
 
     private async Task<Account> RegisterAccount()
     {
@@ -76,6 +89,15 @@ public class AccountBuilder
         {
             await AssetBalance.GiveBalance(account.Id, this._asset.GetId(), this._balance, this._blockchain);
         }
+    }
+
+    private async Task<RateLimit> AddPointsIfNeeded(Account account)
+    {
+        if(this._points > 0)
+        {
+            await RateLimit.GivePoints(account.Id, this._points, this._blockchain);
+        }
+        return await RateLimit.GetByAccountRateLimit(account.Id, this._blockchain);
     }
 
     private AuthDescriptor GetAuthDescriptor()
@@ -96,12 +118,17 @@ public class AccountBuilder
             return new MultiSignatureAuthDescriptor(
                 participants,
                 this._requiredSignaturesCount,
-                this._flags.ToArray()
+                this._flags.ToArray(),
+                this._user.AuthDescriptor.Rule
             );
         }
         else
         {
-            return new SingleSignatureAuthDescriptor(this._participants[0].PubKey, this._flags.ToArray());
+            return new SingleSignatureAuthDescriptor(
+                this._participants[0].PubKey,
+                this._flags.ToArray(),
+                this._user.AuthDescriptor.Rule
+                );
         }
     }
 }

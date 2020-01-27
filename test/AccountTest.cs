@@ -6,7 +6,7 @@ using Xunit;
 
 public class UserTest
 {
-    const string chainId = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+    const string chainId = "F9C55606AF6C9D8C36FDC5DFDB744CA6C8A8D9CC3E222B933BD36473A6D92EF0";
     const string nodeUrl = "http://localhost:7740";
 
     // Correctly creates keypair
@@ -37,15 +37,18 @@ public class UserTest
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
         User user = TestUser.SingleSig();
-        Account account = await Account.Register(user.AuthDescriptor, blockchain.NewSession(user));
+
+        AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
+        accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
+        accountBuilder.WithPoints(1);
+        Account account = await accountBuilder.Build();
+
         Assert.NotNull(account);
 
         AuthDescriptor authDescriptor = new SingleSignatureAuthDescriptor(
                 user.KeyPair.PubKey,
                 new List<FlagsType>(){FlagsType.Transfer}.ToArray()
         );
-        System.Console.WriteLine("Def Descriptor ID: " + Util.ByteArrayToString(user.AuthDescriptor.GetId()));
-        System.Console.WriteLine("Add Descriptor ID: " + Util.ByteArrayToString(authDescriptor.GetId()));
         await account.AddAuthDescriptor(authDescriptor);
         Assert.Equal(2, account.AuthDescriptor.Count);
     }
@@ -167,7 +170,7 @@ public class UserTest
         Account account = await accountBuilder.Build();
         Account[] accounts = await Account.GetByParticipantId(user.KeyPair.PubKey, blockchain.NewSession(user));
         Assert.Equal(1, accounts.Length);
-        Assert.Equal(Util.ByteArrayToString(user.KeyPair.PubKey), Util.ByteArrayToString(accounts[0].AuthDescriptor[0].GetPubKey()[0]));
+        Assert.Equal(Util.ByteArrayToString(user.KeyPair.PubKey), Util.ByteArrayToString(accounts[0].AuthDescriptor[0].PubKey[0]));
     }
 
     // should return two accounts when account is participant of two accounts
@@ -256,7 +259,7 @@ public class UserTest
         , user);
     
         BlockchainSession session = blockchain.NewSession(user);
-        Account account = await session.GetAccountById(user.AuthDescriptor.GetId());
+        Account account = await session.GetAccountById(user.AuthDescriptor.ID);
 
         Assert.NotNull(account);
     }

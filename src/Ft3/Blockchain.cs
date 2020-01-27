@@ -62,24 +62,34 @@ namespace Chromia.Postchain.Ft3
             return await Asset.GetByName(name, this);
         }
 
+        public async Task<Asset> GetAssetById(byte[] id)
+        {
+            return await Asset.GetById(id, this);
+        }
+
+        public async Task<Asset[]> GetAllAssets()
+        {
+            return await Asset.GetAssets(this);
+        }
+
         public async Task LinkChain(byte[] chainId)
         {
             var tx = this.Connection.Gtx.NewTransaction(new byte[][] {});
-            tx.AddOperation("ft3.link_chain", Util.ByteArrayToString(chainId));
+            tx.AddOperation("ft3.xc.link_chain", Util.ByteArrayToString(chainId));
             await tx.PostAndWaitConfirmation();
         }
 
         public async Task<bool> IsLinkedWithChain(byte[] chainId)
         {
             return await this.Query(
-                "ft3.is_linked_with_chain",
+                "ft3.xc.is_linked_with_chain",
                 ("chain_rid", Util.ByteArrayToString(chainId))
             ) == 1;
         }
 
         public async Task<List<byte[]>> GetLinkedChainsIds()
         {
-            var linkedChains = await this.Query("ft3.get_linked_chains");
+            var linkedChains = await this.Query("ft3.xc.get_linked_chains");
             var chainIds = new List<byte[]>();
 
             foreach (var linkedChain in linkedChains)
@@ -111,7 +121,7 @@ namespace Chromia.Postchain.Ft3
         {
             var txBuilder = this.CreateTransactionBuilder();
             txBuilder.AddOperation(operation);
-            var tx = txBuilder.Build(user.AuthDescriptor.GetSigners());
+            var tx = txBuilder.Build(user.AuthDescriptor.Signers);
             tx.Sign(user.KeyPair);
             return await tx.Post();
         }
@@ -119,7 +129,7 @@ namespace Chromia.Postchain.Ft3
         // public void PostRaw(byte[] rawTransaction)
         // {
         //     // const tx = this.connection.gtx.transactionFromRawTransaction(rawTransaction);
-        //     //  await tx.postAndWaitConfirmation();
+        //     // await tx.postAndWaitConfirmation();
         // }
 
         public TransactionBuilder CreateTransactionBuilder()

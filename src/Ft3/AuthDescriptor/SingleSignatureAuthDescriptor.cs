@@ -6,37 +6,47 @@ namespace Chromia.Postchain.Ft3
 {
     public class SingleSignatureAuthDescriptor : AuthDescriptor
     {
-        public byte[] PubKey;
+        private byte[] _pubkey;
         public Flags Flags;
+        public readonly IAuthdescriptorRule AuthRule;
 
-        public SingleSignatureAuthDescriptor(byte[] pubKey, FlagsType[] flags)
+        public SingleSignatureAuthDescriptor(byte[] pubKey, FlagsType[] flags, IAuthdescriptorRule rule = null)
         {
-            this.PubKey = pubKey;
+            this._pubkey = pubKey;
             this.Flags = new Flags(flags.ToList());
+            this.AuthRule = rule;
         }
 
-        public List<byte[]> GetSigners()
+        public List<byte[]> Signers
         {
-            return new List<byte[]>(){this.PubKey};
+            get => new List<byte[]>(){this._pubkey};
         }
 
-        public List<byte[]> GetPubKey()
+        public List<byte[]> PubKey
         {
-            return new List<byte[]>() {this.PubKey};
+            get => new List<byte[]>() {this._pubkey};
         }
 
-        public byte[] GetId()
+        public byte[] ID
         {
-            return this.Hash();
+            get => this.Hash();
+        }
+
+        public IAuthdescriptorRule Rule
+        {
+            get => this.AuthRule;
         }
 
         public dynamic[] ToGTV()
         {
             var gtv = new List<dynamic>(){
                 Util.AuthTypeToString(AuthType.SingleSig),
-                new List<string>(){Util.ByteArrayToString(this.PubKey)}.ToArray(),
-                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}.ToArray()
+                new List<string>(){Util.ByteArrayToString(this._pubkey)}.ToArray(),
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this._pubkey)}.ToArray(),
+                null
+                // this.AuthRule?.ToGTV()
             };
+
             return gtv.ToArray();
         }
 
@@ -44,9 +54,13 @@ namespace Chromia.Postchain.Ft3
         {
             var gtv = new List<dynamic>(){
                 Util.AuthTypeToString(AuthType.SingleSig),
-                new List<byte[]>(){this.PubKey}.ToArray(),
-                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this.PubKey)}.ToArray()
+                new List<byte[]>(){this._pubkey}.ToArray(),
+                new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this._pubkey)}.ToArray(),
+                null
+                //this.AuthRule?.ToGTV()
+                
             }.ToArray();
+            
             return Gtv.Hash(gtv);
         }
     }

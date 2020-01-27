@@ -16,15 +16,6 @@ namespace Chromia.Postchain.Ft3
             return new Operation("ft3.add_auth_descriptor", gtv.ToArray());
         }
 
-        public static Operation Register(AuthDescriptor authDescriptor)
-        {
-            var gtv = new List<dynamic>() {
-                authDescriptor
-            };
-
-            return new Operation("ft3.dev_register_account", gtv.ToArray());
-        }
-
         public static Operation Transfer(dynamic[] inputs, dynamic[] outputs)
         {
             var gtv = new List<dynamic>() {
@@ -54,6 +45,17 @@ namespace Chromia.Postchain.Ft3
             };
 
             return new Operation("ft3.delete_all_auth_descriptors_exclude", gtv.ToArray());
+        }
+
+        public static Operation DeleteAuthDescriptor(byte[] accountId, byte[] authDescriptorId, byte[] deleteAuthDescriptorId)
+        {
+            var gtv = new List<dynamic>() {
+                accountId,
+                authDescriptorId,
+                deleteAuthDescriptorId
+            };
+
+            return new Operation("ft3.delete_auth_descriptor", gtv.ToArray());
         }
 
         public static Operation Nop()

@@ -21,6 +21,7 @@ operation dev_give_balance (asset_id: byte_array, account_id: byte_array, amount
 }
 
 operation dev_register_account (acc.auth_descriptor) {
+    print(auth_descriptor);
     dev_op.require_dev();
     acc.create_account_with_auth( auth_descriptor );
 }

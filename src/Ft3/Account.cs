@@ -52,11 +52,24 @@ namespace Chromia.Postchain.Ft3
 
     public interface AuthDescriptor
     {
+        byte[] ID
+        {
+            get;
+        }
+        List<byte[]> Signers
+        {
+            get;
+        }
+        IAuthdescriptorRule Rule
+        {
+            get;
+        }
+        List<byte[]> PubKey
+        {
+            get;
+        }
         byte[] Hash();
-        List<byte[]> GetSigners();
-        byte[] GetId();
         dynamic[] ToGTV();
-        List<byte[]> GetPubKey();
     }
 
     public class Account
@@ -65,6 +78,7 @@ namespace Chromia.Postchain.Ft3
         public readonly byte[] Id;
         public List<AuthDescriptor> AuthDescriptor;
         public List<AssetBalance> Assets = new List<AssetBalance>();
+        public RateLimit RateLimit;
         public readonly BlockchainSession Session;
 
         public Account(byte[] id, AuthDescriptor[] authDescriptor, BlockchainSession session)
@@ -72,6 +86,11 @@ namespace Chromia.Postchain.Ft3
             this.Id = id;
             this.AuthDescriptor = authDescriptor.ToList();
             this.Session = session;
+        }
+
+        public byte[] GetID()
+        {
+            return Id;
         }
 
         public Blockchain GetBlockchain()
@@ -109,9 +128,9 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account> Register(AuthDescriptor authDescriptor, BlockchainSession session)
         {
-            await session.Call(AccountOperations.Register(authDescriptor));
+            await session.Call(AccountDevOperations.Register(authDescriptor));
             var account = new Account(authDescriptor.Hash(), new List<AuthDescriptor>{authDescriptor}.ToArray(), session);
-            await account.SyncAssets();
+            await account.Sync();
             return account;
         }
 
@@ -119,10 +138,10 @@ namespace Chromia.Postchain.Ft3
         {
             TransactionBuilder txBuilder = session.Blockchain.CreateTransactionBuilder();
             List<byte[]> signers = new List<byte[]>();
-            txBuilder.AddOperation(AccountOperations.Register(authDescriptor));
-            txBuilder.AddOperation(AccountOperations.AddAuthDescriptor(authDescriptor.GetId(), authDescriptor.GetId(), ssoAuthDescriptor));
+            txBuilder.AddOperation(AccountDevOperations.Register(authDescriptor));
+            txBuilder.AddOperation(AccountOperations.AddAuthDescriptor(authDescriptor.ID, authDescriptor.ID, ssoAuthDescriptor));
             
-            signers.AddRange(authDescriptor.GetSigners());
+            signers.AddRange(authDescriptor.Signers);
             // TODO Add sso signers
             var tx = txBuilder.Build(signers);
             tx.Sign(session.User.KeyPair);
@@ -150,9 +169,58 @@ namespace Chromia.Postchain.Ft3
             {
                 return null;
             }
+            
+            var acc = new Account(id, new List<AuthDescriptor>().ToArray(), session);
+            await acc.Sync();
+            return acc;
+        }
 
-            var authGtv = AccountQueries.AccountAuthDescriptors(id);
-            var authDescriptors = await session.Query(authGtv[0], authGtv[1]);
+        public async Task AddAuthDescriptor(AuthDescriptor authDescriptor)
+        {
+            var response = await this.Session.Call(AccountOperations.AddAuthDescriptor(
+                this.Id,
+                this.Session.User.AuthDescriptor.ID,
+                authDescriptor)
+            );
+            this.AuthDescriptor.Add(authDescriptor);
+        }
+
+        public async Task DeleteAllAuthDescriptorsExclude(AuthDescriptor authDescriptor)
+        {
+            await this.Session.Call(AccountOperations.DeleteAllAuthDescriptorsExclude(
+                this.Id,
+                authDescriptor.ID)
+            );
+            this.AuthDescriptor.Clear();
+            this.AuthDescriptor.Add(authDescriptor);
+        }
+        
+        public async Task DeleteAuthDescriptor(AuthDescriptor authDescriptor)
+        {
+            await this.Session.Call(AccountOperations.DeleteAuthDescriptor(
+                this.Id,
+                this.Session.User.AuthDescriptor.ID,
+                authDescriptor.ID)
+            );
+            await this.SyncAuthDescriptors();
+        }
+
+        private async Task Sync()
+        {
+            await SyncAssets();
+            await SyncAuthDescriptors();
+            await SyncRateLimit();
+        }
+
+        private async Task SyncAssets()
+        {
+            this.Assets = await AssetBalance.GetByAccountId(this.Id, this.Session.Blockchain);
+        }
+
+        private async Task SyncAuthDescriptors()
+        {
+            var authGtv = AccountQueries.AccountAuthDescriptors(this.Id);
+            var authDescriptors = await this.Session.Query(authGtv[0], authGtv[1]);
 
             var authDescriptorFactory = new AuthDescriptorFactory();
             List<AuthDescriptor> authList = new List<AuthDescriptor>();
@@ -166,37 +234,13 @@ namespace Chromia.Postchain.Ft3
                     )
                 );
             }
-            
-            var acc = new Account(id, authList.ToArray(), session);
-            await acc.SyncAssets();
-            return acc;
+
+            this.AuthDescriptor = authList;
         }
 
-        public async Task AddAuthDescriptor(AuthDescriptor authDescriptor)
+        private async Task SyncRateLimit()
         {
-            var response = await this.Session.Call(AccountOperations.AddAuthDescriptor(
-                this.Id,
-                this.Session.User.AuthDescriptor.GetId(),
-                authDescriptor)
-            );
-            if(response == null) {
-                this.AuthDescriptor.Add(authDescriptor);
-            }
-        }
-
-        public async Task DeleteAllAuthDescriptorsExclude(AuthDescriptor authDescriptor)
-        {
-            await this.Session.Call(AccountOperations.DeleteAllAuthDescriptorsExclude(
-                this.Id,
-                authDescriptor.GetId())
-            );
-            this.AuthDescriptor.Clear();
-            this.AuthDescriptor.Add(authDescriptor);
-        }
-
-        private async Task SyncAssets()
-        {
-            this.Assets = await AssetBalance.GetByAccountId(this.Id, this.Session.Blockchain);
+            this.RateLimit = await RateLimit.GetByAccountRateLimit(this.Id, this.Session.Blockchain);
         }
 
         public AssetBalance GetAssetById(byte[] id)
@@ -220,7 +264,7 @@ namespace Chromia.Postchain.Ft3
             var input = new List<dynamic>{
                 this.Id,
                 assetId,
-                this.Session.User.AuthDescriptor.GetId(),
+                this.Session.User.AuthDescriptor.ID,
                 amount,
                 new dynamic[] {}
             }.ToArray();
@@ -286,7 +330,7 @@ namespace Chromia.Postchain.Ft3
             var source = new List<dynamic>() {
                 this.Id,
                 assetId,
-                this.Session.User.AuthDescriptor.GetId(),
+                this.Session.User.AuthDescriptor.ID,
                 amount,
                 new dynamic[] {}
             }.ToArray();

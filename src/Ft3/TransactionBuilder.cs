@@ -71,7 +71,7 @@ namespace Chromia.Postchain.Ft3
 
         public Transaction BuildAndSign(User user)
         {
-            var tx = this.Build(user.AuthDescriptor.GetSigners());
+            var tx = this.Build(user.AuthDescriptor.Signers);
             tx.Sign(user.KeyPair);
             return tx;
         }

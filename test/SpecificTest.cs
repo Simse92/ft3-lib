@@ -33,7 +33,7 @@ public class SpecificTest
 
         // LOGIN with localstorage keypair
         User impUser = new User(keyPair, gameSingleSigAuthDescriptor);
-        Account[] impAccount = await Account.GetByAuthDescriptorId(gameSingleSigAuthDescriptor.GetId(), blockchain.NewSession(impUser));
+        Account[] impAccount = await Account.GetByAuthDescriptorId(gameSingleSigAuthDescriptor.ID, blockchain.NewSession(impUser));
         Account myAccount = impAccount[0];
         System.Console.WriteLine("imported:" + myAccount.AuthDescriptor.Count);
 

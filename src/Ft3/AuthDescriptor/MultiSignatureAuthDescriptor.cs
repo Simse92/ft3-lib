@@ -10,8 +10,9 @@ namespace Chromia.Postchain.Ft3
         public List<byte[]> PubKeys;
         public Flags Flags;
         public int SignatureRequired;
+        public readonly IAuthdescriptorRule AuthRule;
 
-        public MultiSignatureAuthDescriptor(List<byte[]> pubkeys, int signatureRequired, FlagsType[] flags)
+        public MultiSignatureAuthDescriptor(List<byte[]> pubkeys, int signatureRequired, FlagsType[] flags, IAuthdescriptorRule rule = null)
         {
             if(signatureRequired > pubkeys.Count)
             {
@@ -21,22 +22,27 @@ namespace Chromia.Postchain.Ft3
             this.PubKeys = pubkeys;
             this.SignatureRequired = signatureRequired;
             this.Flags = new Flags(flags.ToList());
+            this.AuthRule = rule;
         }
 
-        public List<byte[]> GetSigners()
+        public List<byte[]> Signers
         {
-            return this.PubKeys;
+            get => this.PubKeys;
         }
 
-        public List<byte[]> GetPubKey()
+        public List<byte[]> PubKey
         {
-            return this.PubKeys;
+            get => this.PubKeys;
         }
 
-
-        public byte[] GetId()
+        public byte[] ID
         {
-            return this.Hash();
+            get => this.Hash();
+        }
+
+        public IAuthdescriptorRule Rule
+        {
+            get => this.AuthRule;
         }
         
         public dynamic[] ToGTV()
@@ -55,7 +61,8 @@ namespace Chromia.Postchain.Ft3
                     this.Flags.ToGTV(),
                     this.SignatureRequired,
                     hexPubs.ToArray()
-                }.ToArray()
+                }.ToArray(),
+                this.AuthRule.ToGTV() ?? null
             };
             return gtv.ToArray();
         }
@@ -77,7 +84,8 @@ namespace Chromia.Postchain.Ft3
                     this.Flags.ToGTV(),
                     this.SignatureRequired,
                     hexPubs.ToArray()
-                }.ToArray()
+                }.ToArray(),
+                this.AuthRule.ToGTV() ?? null
             }.ToArray();
 
             return Gtv.Hash(gtv);
