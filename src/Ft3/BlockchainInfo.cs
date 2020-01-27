@@ -6,31 +6,29 @@ namespace Chromia.Postchain.Ft3
     {
         public string Name;
         public string Website;
-        public string Descriptor;
+        public string Description;
         public int RequestMaxCount;
         public int RequestRecoveryTime;
 
-        public BlockchainInfo(string name, string website, string descriptor, int requestMaxCount, int requestRecoveryTime)
+        public BlockchainInfo(string name, string website, string description, int requestMaxCount, int requestRecoveryTime)
         {
             this.Name = name;
             this.Website = website;
-            this.Descriptor = descriptor;
+            this.Description = description;
             this.RequestMaxCount = requestMaxCount;
             this.RequestRecoveryTime = requestRecoveryTime;
         }
 
         public static async Task<BlockchainInfo> GetInfo(ConnectionClient connection)
         {
-            try
+            var info = await connection.Query<BlockchainInfo>("ft3.get_blockchain_info");
+
+            if(info.control.Error)
             {
-                var info = await connection.Query("ft3.get_blockchain_info");
-                return new BlockchainInfo((string) info["name"], (string) info["website"], (string) info["description"], (int) info["request_max_count"], (int) info["request_recovery_time"]);
+                return new BlockchainInfo(connection.ChainID, null, null, 0, 0);
             }
-            catch
-            {
-                 return new BlockchainInfo(connection.ChainID, null, null, 0, 0);
-            }
+
+            return info.content;
         }
     }
-
 }

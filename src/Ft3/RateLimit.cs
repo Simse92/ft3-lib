@@ -31,14 +31,14 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<RateLimit> GetByAccountRateLimit(byte[] accountID, Blockchain blockchain)
         {
-            var rateInfo = await blockchain.Connection.Gtx.Query("ft3.get_account_rate_limit", ("account_id", Util.ByteArrayToString(accountID)));
+            var rateInfo = await blockchain.Connection.Gtx.Query<RateLimit>("ft3.get_account_rate_limit", ("account_id", Util.ByteArrayToString(accountID)));
 
-            if(rateInfo == null)
+            if(rateInfo.control.Error)
             {
                 return null;
             }
 
-            return new RateLimit((int) rateInfo["points"], (int) rateInfo["last_update"]);
+            return rateInfo.content;
         }
 
         public static async Task GivePoints(byte[] accountID, int points, Blockchain blockchain)
@@ -52,8 +52,8 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<long> GetLastTimestamp(Blockchain blockchain)
         {
-            var ts = await blockchain.Connection.Gtx.Query("ft3.get_last_timestamp");
-            return (long) ts;
+            var ts = await blockchain.Connection.Gtx.Query<long>("ft3.get_last_timestamp");
+            return ts.content;
         }
 
         public static async Task<int> GetPointsAvailable(int points, int lastOperation, Blockchain blockchain)

@@ -1,3 +1,4 @@
+using Chromia.Postchain.Client.GTX;
 using System.Threading.Tasks;
 
 namespace Chromia.Postchain.Ft3
@@ -28,9 +29,9 @@ namespace Chromia.Postchain.Ft3
             return await Account.GetByAuthDescriptorId(id, this);
         }
 
-        public async Task<dynamic> Query(string name, params dynamic[] queryObject)
+        public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params dynamic[] queryObject)
         {
-            return await this.Blockchain.Query(name, queryObject);
+            return await this.Blockchain.Query<T>(name, queryObject);
         }
 
         public async Task<dynamic> Call(Operation operation)

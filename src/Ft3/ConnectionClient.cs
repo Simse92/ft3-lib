@@ -1,5 +1,5 @@
-using Chromia.Postchain.Client;
 using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 using System.Threading.Tasks;
 
 namespace Chromia.Postchain.Ft3
@@ -19,9 +19,9 @@ namespace Chromia.Postchain.Ft3
             this.Gtx = new GTXClient(restClient, chainID);
         }
 
-        public async Task<dynamic> Query(string name, params dynamic[] queryObject)
+        public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params dynamic[] queryObject)
         {
-            return await this.Gtx.Query(name, queryObject);
+            return await this.Gtx.Query<T>(name, queryObject);
         }
     }
 }

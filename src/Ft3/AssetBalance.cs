@@ -16,10 +16,10 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<List<AssetBalance>> GetByAccountId(byte[] id, Blockchain blockchain)
         {
-            var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_balances", ("account_id", Util.ByteArrayToString(id)));
+            var assets = await blockchain.Connection.Gtx.Query<dynamic>("ft3.get_asset_balances", ("account_id", Util.ByteArrayToString(id)));
             List<AssetBalance> assetsBalances = new List<AssetBalance>();
 
-            foreach (var asset in assets)
+            foreach (var asset in assets.content)
             {
                 assetsBalances.Add(
                     new AssetBalance(
@@ -36,17 +36,17 @@ namespace Chromia.Postchain.Ft3
     
         public static async Task<AssetBalance> GetByAccountAndAssetId(byte[] accountId, byte[] assetId, Blockchain blockchain)
         {
-            var asset = await blockchain.Connection.Gtx.Query("ft3.get_asset_balance", 
+            var asset = await blockchain.Connection.Gtx.Query<dynamic>("ft3.get_asset_balance", 
                                                                 ("account_id", Util.ByteArrayToString(accountId)),
                                                                 ("asset_id", Util.ByteArrayToString(assetId))
             );
 
-            if(asset == null)
+            if(asset.control.Error)
             {
                 return null;
             }
 
-            return new AssetBalance((int) asset["amount"], new Asset((string) asset["name"], (byte[]) asset["chainId"]));
+            return new AssetBalance((int) asset.content["amount"], new Asset((string) asset.content["name"], (byte[]) asset.content["chainId"]));
         }
 
         public static async Task GiveBalance(byte[] accountId, byte[] assetId, int amount, Blockchain blockchain)

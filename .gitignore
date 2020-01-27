@@ -220,6 +220,13 @@ project.lock.json
 *.feature.xlsx.*
 *.Specs_*.html
 
+rell/postchain-node/
+rell/logs/
+rell/config/
+rell/target
+.project
+postchain.pid
+
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####

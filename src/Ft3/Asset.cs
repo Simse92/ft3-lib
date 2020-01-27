@@ -31,15 +31,15 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Asset[]> GetByName(string name, Blockchain blockchain)
         {
-            var assets = await blockchain.Connection.Gtx.Query("ft3.get_asset_by_name", ("name", name));
+            var assets = await blockchain.Connection.Gtx.Query<dynamic>("ft3.get_asset_by_name", ("name", name));
             List<Asset> assetList = new List<Asset>();
 
-            foreach (var asset in assets)
+            foreach (var asset in assets.content)
             {
                 assetList.Add(
                     new Asset(
-                        (string) asset["name"],
-                        Util.HexStringToBuffer((string) asset["issuing_chain_rid"])
+                        (string) assets.content["name"],
+                        Util.HexStringToBuffer((string) assets.content["issuing_chain_rid"])
                     )
                 );
             }
@@ -48,16 +48,16 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Asset> GetById(byte[] id, Blockchain blockchain)
         {
-            var asset = await blockchain.Connection.Gtx.Query("ft3.get_asset_by_id", ("asset_id", Util.ByteArrayToString(id)));
-            return new Asset((string) asset["name"], Util.HexStringToBuffer((string) asset["issuing_chain_rid"]));
+            var asset = await blockchain.Connection.Gtx.Query<dynamic>("ft3.get_asset_by_id", ("asset_id", Util.ByteArrayToString(id)));
+            return new Asset((string) asset.content["name"], Util.HexStringToBuffer((string) asset.content["issuing_chain_rid"]));
         }
         
         public static async Task<Asset[]> GetAssets(Blockchain blockchain)
         {
-            var assets = await blockchain.Connection.Gtx.Query("ft3.get_all_assets");
+            var assets = await blockchain.Connection.Gtx.Query<dynamic>("ft3.get_all_assets");
             List<Asset> assetList = new List<Asset>();
 
-            foreach (var asset in assets)
+            foreach (var asset in assets.content)
             {
                 assetList.Add(
                     new Asset(

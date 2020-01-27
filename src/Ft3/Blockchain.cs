@@ -1,6 +1,8 @@
-using System.Threading.Tasks;
-using System;
+using Chromia.Postchain.Client.GTX;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -81,40 +83,41 @@ namespace Chromia.Postchain.Ft3
 
         public async Task<bool> IsLinkedWithChain(byte[] chainId)
         {
-            return await this.Query(
+            var info = await this.Query<int>(
                 "ft3.xc.is_linked_with_chain",
                 ("chain_rid", Util.ByteArrayToString(chainId))
-            ) == 1;
+            );
+
+            if(info.control.Error)
+            {
+                return false;
+            }
+
+            return info.content == 1;
         }
 
         public async Task<List<byte[]>> GetLinkedChainsIds()
         {
-            var linkedChains = await this.Query("ft3.xc.get_linked_chains");
-            var chainIds = new List<byte[]>();
-
-            foreach (var linkedChain in linkedChains)
+            var linkedChains = await this.Query<string[]>("ft3.xc.get_linked_chains");
+            
+            if(linkedChains.control.Error)
             {
-                chainIds.Add(Util.HexStringToBuffer((string) linkedChain));
+                Console.WriteLine(linkedChains.control.ErrorMessage);
+                return new List<byte[]>();
             }
-
-            return chainIds;
+            
+            return linkedChains.content.Select(elem => Util.HexStringToBuffer(elem)).ToList();
         }
 
         public async Task<Blockchain[]> GetLinkedChains()
         {
             var chainIds = await this.GetLinkedChainsIds();
-            var blockchains = new List<Blockchain>();
-            foreach (var chainId in chainIds)
-            {
-                blockchains.Add(await Blockchain.Initialize(chainId, this._directoryService));
-            }
-
-            return blockchains.ToArray();
+            return await Task.WhenAll(chainIds.Select(elem => Blockchain.Initialize(elem, this._directoryService)));
         }
-
-        public async Task<dynamic> Query(string name, params dynamic[] queryObject)
+        
+        public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params dynamic[] queryObject)
         {
-            return await this.Connection.Query(name, queryObject);
+            return await this.Connection.Query<T>(name, queryObject);
         }
 
         public async Task<dynamic> Call(Operation operation, User user)
@@ -125,12 +128,6 @@ namespace Chromia.Postchain.Ft3
             tx.Sign(user.KeyPair);
             return await tx.Post();
         }
-
-        // public void PostRaw(byte[] rawTransaction)
-        // {
-        //     // const tx = this.connection.gtx.transactionFromRawTransaction(rawTransaction);
-        //     // await tx.postAndWaitConfirmation();
-        // }
 
         public TransactionBuilder CreateTransactionBuilder()
         {
