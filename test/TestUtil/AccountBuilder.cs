@@ -68,8 +68,12 @@ public class AccountBuilder
     public async Task<Account> Build()
     {
         var account = await this.RegisterAccount();
-        await this.AddBalanceIfNeeded(account);
-        account.RateLimit = await this.AddPointsIfNeeded(account);
+        if(account != null)
+        {
+             await this.AddBalanceIfNeeded(account);
+            account.RateLimit = await this.AddPointsIfNeeded(account);
+        }
+       
         return account;
     }
 

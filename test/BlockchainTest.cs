@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Chromia.Postchain.Ft3;
+using System.Linq;
 using Xunit;
 
 public class BlockchainTest
@@ -17,7 +18,7 @@ public class BlockchainTest
     }
 
     // should be able to register an account
-    [Fact]
+    [Fact(Skip = "Working")]
     public async void BlockchainTestRun2()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
@@ -88,11 +89,10 @@ public class BlockchainTest
         await blockchain.LinkChain(chainId2);
 
         List<byte[]> linkedChains = await blockchain.GetLinkedChainsIds();
+        var parsedChains = linkedChains.Select(elem => Util.ByteArrayToString(elem));
 
-        var parsed = new List<string>()  {
-            Util.ByteArrayToString(linkedChains[0]),
-            Util.ByteArrayToString(linkedChains[1])
-        };
+        Assert.Contains(Util.ByteArrayToString(chainId1), parsedChains);
+        Assert.Contains(Util.ByteArrayToString(chainId2), parsedChains);
     }
 
     // should return false when isLinkedWithChain is called for unknown chain id
@@ -100,7 +100,17 @@ public class BlockchainTest
     public async void BlockchainTestRun7()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
-
         Assert.Equal(false, await blockchain.IsLinkedWithChain(TestUtil.GenerateId()));
+    }
+
+    // should return asset queried by id
+    [Fact(Skip = "Working")]
+    public async void BlockchainTestRun8()
+    {
+        Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
+        Asset asset = await Asset.Register(TestUtil.GenerateAssetName(), TestUtil.GenerateId(), blockchain);
+        Asset queriedAsset = await blockchain.GetAssetById(asset.GetId());
+
+        Asset.Equals(asset, queriedAsset);
     }
 }

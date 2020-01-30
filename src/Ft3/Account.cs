@@ -1,3 +1,4 @@
+using Chromia.Postchain.Client.GTX;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -101,10 +102,11 @@ namespace Chromia.Postchain.Ft3
         public static async Task<Account[]> GetByParticipantId(byte[] id, BlockchainSession session)
         {
             var gtv = AccountQueries.AccountsByParticipantId(id);
-            var accountIds = await session.Query(gtv[0], gtv[1]);
-
+            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>(gtv[0], gtv[1]);
+            
+     
             var idList = new List<byte[]>();
-            foreach (var accountId in accountIds)
+            foreach (var accountId in accountIds.content)
             {
                 idList.Add(Util.HexStringToBuffer((string) accountId));
             }
@@ -115,10 +117,10 @@ namespace Chromia.Postchain.Ft3
         public static async Task<Account[]> GetByAuthDescriptorId(byte[] id, BlockchainSession session)
         {
             var gtv = AccountQueries.AccountsByAuthDescriptorId(id);
-            var accountIds = await session.Query(gtv[0], gtv[1]);
+            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>(gtv[0], gtv[1]);
 
             var idList = new List<byte[]>();
-            foreach (var accountId in accountIds)
+            foreach (var accountId in accountIds.content)
             {
                 idList.Add(Util.HexStringToBuffer((string) accountId));
             }
@@ -128,7 +130,11 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account> Register(AuthDescriptor authDescriptor, BlockchainSession session)
         {
-            await session.Call(AccountDevOperations.Register(authDescriptor));
+            PostchainErrorControl opControl = await session.Call(AccountDevOperations.Register(authDescriptor));
+            if(opControl.Error)
+            {
+                return null;
+            }
             var account = new Account(authDescriptor.Hash(), new List<AuthDescriptor>{authDescriptor}.ToArray(), session);
             await account.Sync();
             return account;
@@ -163,9 +169,9 @@ namespace Chromia.Postchain.Ft3
         public static async Task<Account> GetById(byte[] id, BlockchainSession session)
         {
             var gtv = AccountQueries.AccountById(id);
-            var account = await session.Query(gtv[0], gtv[1]);
+            (dynamic content, PostchainErrorControl control) account = await session.Query<dynamic>(gtv[0], gtv[1]);
 
-            if(account == null)
+            if(account.control.Error)
             {
                 return null;
             }
@@ -175,14 +181,18 @@ namespace Chromia.Postchain.Ft3
             return acc;
         }
 
-        public async Task AddAuthDescriptor(AuthDescriptor authDescriptor)
+        public async Task<PostchainErrorControl> AddAuthDescriptor(AuthDescriptor authDescriptor)
         {
             var response = await this.Session.Call(AccountOperations.AddAuthDescriptor(
                 this.Id,
                 this.Session.User.AuthDescriptor.ID,
                 authDescriptor)
             );
-            this.AuthDescriptor.Add(authDescriptor);
+            if(!response.Error)
+            {
+                this.AuthDescriptor.Add(authDescriptor);
+            }
+            return response;
         }
 
         public async Task DeleteAllAuthDescriptorsExclude(AuthDescriptor authDescriptor)
@@ -195,17 +205,19 @@ namespace Chromia.Postchain.Ft3
             this.AuthDescriptor.Add(authDescriptor);
         }
         
-        public async Task DeleteAuthDescriptor(AuthDescriptor authDescriptor)
+        public async Task<PostchainErrorControl> DeleteAuthDescriptor(AuthDescriptor authDescriptor)
         {
-            await this.Session.Call(AccountOperations.DeleteAuthDescriptor(
+            var opControl = await this.Session.Call(AccountOperations.DeleteAuthDescriptor(
                 this.Id,
                 this.Session.User.AuthDescriptor.ID,
                 authDescriptor.ID)
             );
             await this.SyncAuthDescriptors();
+
+            return opControl;
         }
 
-        private async Task Sync()
+        public async Task Sync()
         {
             await SyncAssets();
             await SyncAuthDescriptors();
@@ -220,12 +232,12 @@ namespace Chromia.Postchain.Ft3
         private async Task SyncAuthDescriptors()
         {
             var authGtv = AccountQueries.AccountAuthDescriptors(this.Id);
-            var authDescriptors = await this.Session.Query(authGtv[0], authGtv[1]);
+            (dynamic content, PostchainErrorControl control) authDescriptors = await this.Session.Query<dynamic>(authGtv[0], authGtv[1]);
 
             var authDescriptorFactory = new AuthDescriptorFactory();
             List<AuthDescriptor> authList = new List<AuthDescriptor>();
 
-            foreach (var authDescriptor in authDescriptors)
+            foreach (var authDescriptor in authDescriptors.content)
             {
                 authList.Add(
                     authDescriptorFactory.Create(
@@ -248,18 +260,19 @@ namespace Chromia.Postchain.Ft3
             return this.Assets.Find(assetBalance => Util.ByteArrayToString(assetBalance.Asset.GetId()).Equals(Util.ByteArrayToString(id)));
         }
 
-        public async Task TransferInputsToOutputs(dynamic[] inputs, dynamic[] outputs)
+        public async Task<PostchainErrorControl> TransferInputsToOutputs(dynamic[] inputs, dynamic[] outputs)
         {
             var transactionBuilder = this.GetBlockchain().CreateTransactionBuilder();
 
             transactionBuilder.AddOperation(AccountOperations.Transfer(inputs, outputs));
             transactionBuilder.AddOperation(AccountOperations.Nop());
             var tx = transactionBuilder.BuildAndSign(this.Session.User);
-            await tx.Post();
+            PostchainErrorControl opControl = await tx.Post();
             await this.SyncAssets();
+            return opControl;
         }
 
-        public async Task Transfer(byte[] accountId, byte[] assetId, int amount)
+        public async Task<PostchainErrorControl> Transfer(byte[] accountId, byte[] assetId, int amount)
         {
             var input = new List<dynamic>{
                 this.Id,
@@ -276,7 +289,7 @@ namespace Chromia.Postchain.Ft3
                 new dynamic[] {}
             }.ToArray();
 
-            await this.TransferInputsToOutputs(
+            return await this.TransferInputsToOutputs(
                 new List<dynamic>(){input}.ToArray(),
                 new List<dynamic>(){output}.ToArray()
             );
@@ -298,7 +311,7 @@ namespace Chromia.Postchain.Ft3
             );
         }
 
-        public async Task<dynamic> GetPaymentHistory()
+        public async Task<PaymentHistoryEntryShort[]> GetPaymentHistory()
         {
             return await PaymentHistory.GetAccountById(this.Id, this.Session.Blockchain.Connection);
         }

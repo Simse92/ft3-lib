@@ -33,32 +33,32 @@ namespace Chromia.Postchain.Ft3
             this.Variable = variable;
         }
 
-        public RuleExpression LessThan(int value)
+        public RuleExpression LessThan(long value)
         {
             return this.Expression("lt", value);
         }
 
-        public RuleExpression LessOrEqual(int value)
+        public RuleExpression LessOrEqual(long value)
         {
             return this.Expression("le", value);
         }
 
-        public RuleExpression Equal(int value)
+        public RuleExpression Equal(long value)
         {
             return this.Expression("eq", value);
         }
 
-        public RuleExpression GreaterThan(int value)
+        public RuleExpression GreaterThan(long value)
         {
             return this.Expression("gt", value);
         }
 
-        public RuleExpression GreaterOrEqual(int value)
+        public RuleExpression GreaterOrEqual(long value)
         {
             return this.Expression("ge", value);
         }
 
-        private RuleExpression Expression(string op, int value)
+        private RuleExpression Expression(string op, long value)
         {
             return new RuleExpression(this.Variable, op, value);
         }
@@ -68,9 +68,9 @@ namespace Chromia.Postchain.Ft3
     {
         public readonly string Name;
         public readonly string Operator;
-        public readonly int Value;
+        public readonly long Value;
 
-        public RuleExpression(string name, string op, int value)
+        public RuleExpression(string name, string op, long value)
         {
             Name = name;
             Operator = op;
@@ -134,32 +134,32 @@ namespace Chromia.Postchain.Ft3
             Operator = op;
         }
         
-        public RuleCompositeExpression LessThan(int value)
+        public RuleCompositeExpression LessThan(long value)
         {
             return this.CompositeExpression("lt", value);
         }
 
-        public RuleCompositeExpression LessOrEqual(int value)
+        public RuleCompositeExpression LessOrEqual(long value)
         {
             return this.CompositeExpression("le", value);
         }
 
-        public RuleCompositeExpression Equal(int value)
+        public RuleCompositeExpression Equal(long value)
         {
             return this.CompositeExpression("eq", value);
         }
 
-        public RuleCompositeExpression GreaterThan(int value)
+        public RuleCompositeExpression GreaterThan(long value)
         {
             return this.CompositeExpression("gt", value);
         }
 
-        public RuleCompositeExpression GreaterOrEqual(int value)
+        public RuleCompositeExpression GreaterOrEqual(long value)
         {
             return this.CompositeExpression("ge", value);
         }
 
-        private RuleCompositeExpression CompositeExpression(string op, int value)
+        private RuleCompositeExpression CompositeExpression(string op, long value)
         {
             return new RuleCompositeExpression(this.Operator, this.Expression, new RuleExpression(this.Name, op, value));
         }

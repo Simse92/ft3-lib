@@ -4,7 +4,7 @@ using Xunit;
 
 public class PaymentHistoryIteratorTest
 {
-    const string chainId = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+    const string chainId = "61A42DF2FDED147AFBF3B14DCD6F34F9F1747B60C6EF248F4ECCCF5427A73041";
     const string nodeUrl = "http://localhost:7740";
 
     // should have one payment history entry when one transfer is made
@@ -19,6 +19,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(1);
         Account account1 = await accountBuilder.Build();
 
         AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain);
@@ -50,6 +51,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(2);
         Account account1 = await accountBuilder.Build();
 
         AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain);
@@ -82,6 +84,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(1);
         Account account1 = await accountBuilder.Build();
 
         await account1.Transfer(account1.Id, asset.GetId(), 15);
@@ -116,6 +119,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(4);
         Account account1 = await accountBuilder.Build();
 
         AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain);
@@ -146,6 +150,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(1);
         Account account1 = await accountBuilder.Build();
 
         var chainId2 = TestUtil.GenerateId();
@@ -175,6 +180,7 @@ public class PaymentHistoryIteratorTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 200);
+        accountBuilder.WithPoints(2);
         Account account1 = await accountBuilder.Build();
 
         AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain);

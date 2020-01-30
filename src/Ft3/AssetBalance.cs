@@ -46,7 +46,7 @@ namespace Chromia.Postchain.Ft3
                 return null;
             }
 
-            return new AssetBalance((int) asset.content["amount"], new Asset((string) asset.content["name"], (byte[]) asset.content["chainId"]));
+            return new AssetBalance((int) asset.content["amount"], new Asset((string) asset.content["name"], (byte[]) asset.content["chain_id"]));
         }
 
         public static async Task GiveBalance(byte[] accountId, byte[] assetId, int amount, Blockchain blockchain)

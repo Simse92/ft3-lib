@@ -1,11 +1,10 @@
-using System;
 using System.Collections.Generic;
 using Chromia.Postchain.Ft3;
 using Xunit;
 
 public class XcTransferTest
 {
-    const string chainId = "0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF0123456789ABCDEF";
+    const string chainId = "61A42DF2FDED147AFBF3B14DCD6F34F9F1747B60C6EF248F4ECCCF5427A73041";
     const string nodeUrl = "http://localhost:7740";
 
     // Cross-chain transfer
@@ -22,6 +21,7 @@ public class XcTransferTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         accountBuilder.WithBalance(asset, 100);
+        accountBuilder.WithPoints(1);
         Account account = await accountBuilder.Build();
 
         await account.XcTransfer(destinationChainId, destinationAccountId, asset.GetId(), 10);

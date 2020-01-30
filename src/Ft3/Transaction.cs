@@ -1,3 +1,4 @@
+using Chromia.Postchain.Client.GTX;
 using System.Threading.Tasks;
 
 namespace Chromia.Postchain.Ft3
@@ -19,7 +20,7 @@ namespace Chromia.Postchain.Ft3
             return this;
         }
 
-        public async Task<dynamic> Post()
+        public async Task<PostchainErrorControl> Post()
         {
             return await this._tx.PostAndWaitConfirmation();
         }

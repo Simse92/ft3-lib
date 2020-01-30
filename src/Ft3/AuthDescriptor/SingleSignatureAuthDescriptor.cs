@@ -43,8 +43,7 @@ namespace Chromia.Postchain.Ft3
                 Util.AuthTypeToString(AuthType.SingleSig),
                 new List<string>(){Util.ByteArrayToString(this._pubkey)}.ToArray(),
                 new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this._pubkey)}.ToArray(),
-                null
-                // this.AuthRule?.ToGTV()
+                this.AuthRule?.ToGTV()
             };
 
             return gtv.ToArray();
@@ -56,8 +55,7 @@ namespace Chromia.Postchain.Ft3
                 Util.AuthTypeToString(AuthType.SingleSig),
                 new List<byte[]>(){this._pubkey}.ToArray(),
                 new List<dynamic>(){this.Flags.ToGTV(), Util.ByteArrayToString(this._pubkey)}.ToArray(),
-                null
-                //this.AuthRule?.ToGTV()
+                this.AuthRule?.ToGTV()
                 
             }.ToArray();
             

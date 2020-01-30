@@ -62,7 +62,7 @@ namespace Chromia.Postchain.Ft3
                     this.SignatureRequired,
                     hexPubs.ToArray()
                 }.ToArray(),
-                this.AuthRule.ToGTV() ?? null
+                this.AuthRule?.ToGTV()
             };
             return gtv.ToArray();
         }
@@ -85,7 +85,7 @@ namespace Chromia.Postchain.Ft3
                     this.SignatureRequired,
                     hexPubs.ToArray()
                 }.ToArray(),
-                this.AuthRule.ToGTV() ?? null
+                this.AuthRule?.ToGTV()
             }.ToArray();
 
             return Gtv.Hash(gtv);

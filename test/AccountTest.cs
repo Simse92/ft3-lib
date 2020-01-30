@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Chromia.Postchain.Ft3;
 using Xunit;
@@ -6,7 +5,7 @@ using Xunit;
 
 public class UserTest
 {
-    const string chainId = "F9C55606AF6C9D8C36FDC5DFDB744CA6C8A8D9CC3E222B933BD36473A6D92EF0";
+    const string chainId = "6539EC234FC62BE2B3F6C8B391FC4BBAA75455DAEF1F32CD0D3674BADEE8F19F";
     const string nodeUrl = "http://localhost:7740";
 
     // Correctly creates keypair
@@ -45,11 +44,10 @@ public class UserTest
 
         Assert.NotNull(account);
 
-        AuthDescriptor authDescriptor = new SingleSignatureAuthDescriptor(
+        await account.AddAuthDescriptor( new SingleSignatureAuthDescriptor(
                 user.KeyPair.PubKey,
                 new List<FlagsType>(){FlagsType.Transfer}.ToArray()
-        );
-        await account.AddAuthDescriptor(authDescriptor);
+        ));
         Assert.Equal(2, account.AuthDescriptor.Count);
     }
 
@@ -68,12 +66,13 @@ public class UserTest
         );
         Assert.NotNull(account);
 
-        await account.AddAuthDescriptor(
+        var response = await account.AddAuthDescriptor(
             new SingleSignatureAuthDescriptor(
                 user.KeyPair.PubKey,
                 new List<FlagsType>(){FlagsType.Transfer}.ToArray()
             )
         );
+        Assert.Equal(true, response.Error);
         Assert.Equal(1, account.AuthDescriptor.Count);
     }
 
@@ -100,7 +99,7 @@ public class UserTest
     }
 
     // should update account if 2 signatures provided
-    [Fact(Skip = "Not Working")]
+    [Fact(Skip = "Working")]
     public async void AccountTest6()
     {
         Blockchain blockchain = await BlockchainUtil.GetDefaultBlockchain(chainId, nodeUrl);
@@ -168,6 +167,7 @@ public class UserTest
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user);
         accountBuilder.WithParticipants(new List<KeyPair>(){user.KeyPair});
         Account account = await accountBuilder.Build();
+        
         Account[] accounts = await Account.GetByParticipantId(user.KeyPair.PubKey, blockchain.NewSession(user));
         Assert.Equal(1, accounts.Length);
         Assert.Equal(Util.ByteArrayToString(user.KeyPair.PubKey), Util.ByteArrayToString(accounts[0].AuthDescriptor[0].PubKey[0]));
@@ -187,6 +187,7 @@ public class UserTest
 
         AccountBuilder accountBuilder2 = AccountBuilder.CreateAccountBuilder(blockchain, user2);
         accountBuilder2.WithParticipants(new List<KeyPair>(){user2.KeyPair});
+        accountBuilder2.WithPoints(1);
         Account account2 = await accountBuilder2.Build();
 
         await account2.AddAuthDescriptor(
@@ -223,6 +224,7 @@ public class UserTest
 
         AccountBuilder accountBuilder = AccountBuilder.CreateAccountBuilder(blockchain, user1);
         accountBuilder.WithParticipants(new List<KeyPair>(){user1.KeyPair});
+        accountBuilder.WithPoints(3);
         Account account = await accountBuilder.Build();
 
         AuthDescriptor authDescriptor1 = new SingleSignatureAuthDescriptor(

@@ -20,7 +20,7 @@ namespace Chromia.Postchain.Ft3
             return Points;
         }
 
-        public static async void ExecFreeOperation(byte[] accountID, Blockchain blockchain)
+        public static async Task ExecFreeOperation(byte[] accountID, Blockchain blockchain)
         {
             var txBuilder = blockchain.CreateTransactionBuilder();
             txBuilder.AddOperation(AccountDevOperations.FreeOp(accountID));

@@ -120,7 +120,7 @@ namespace Chromia.Postchain.Ft3
             return await this.Connection.Query<T>(name, queryObject);
         }
 
-        public async Task<dynamic> Call(Operation operation, User user)
+        public async Task<PostchainErrorControl> Call(Operation operation, User user)
         {
             var txBuilder = this.CreateTransactionBuilder();
             txBuilder.AddOperation(operation);

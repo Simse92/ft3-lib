@@ -38,8 +38,8 @@ namespace Chromia.Postchain.Ft3
             {
                 assetList.Add(
                     new Asset(
-                        (string) assets.content["name"],
-                        Util.HexStringToBuffer((string) assets.content["issuing_chain_rid"])
+                        (string) asset["name"],
+                        Util.HexStringToBuffer((string) asset["issuing_chain_rid"])
                     )
                 );
             }

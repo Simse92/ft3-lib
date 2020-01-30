@@ -1135,6 +1135,7 @@ operation dev_register_asset (name, issuing_chain_rid: byte_array) {
 
 operation dev_give_balance (asset_id: byte_array, account_id: byte_array, amount: integer) {
     dev_op.require_dev();
+    print("amount: " + amount); 
     require(amount &gt;= 0);
     ft3.ensure_balance( acc.account @ { account_id }, ft3.asset @ { .id == asset_id } ).amount += amount;
 }
