@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -17,7 +17,7 @@ namespace Chromia.Postchain.Ft3
 
         private SingleSignatureAuthDescriptor CreateSingleSig(byte[] args)
         {   
-            var decodedDescriptor = Gtx.Deserialize(args);
+            var decodedDescriptor = PostchainUtil.DeserializeGTX(args);
             var flags = new List<FlagsType>();
 
             foreach (var flag in decodedDescriptor.Array[0].Array)

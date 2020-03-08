@@ -2,7 +2,6 @@
 
   <PropertyGroup>
      <TargetFramework>netcoreapp2.2</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -17,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="PostchainClient">
-      <HintPath>../libs/postchain-client.dll</HintPath>
+    <Reference Include="Postchain.Client">
+      <HintPath>../libs/Postchain.Client.dll</HintPath>
     </Reference>
   </ItemGroup>
 

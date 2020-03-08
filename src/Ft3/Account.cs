@@ -1,4 +1,4 @@
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;

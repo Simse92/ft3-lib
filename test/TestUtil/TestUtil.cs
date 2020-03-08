@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Chromia.Postchain.Client.GTV;
+using Chromia.Postchain.Client;
 
 public class TestUtil
 {
@@ -16,7 +16,7 @@ public class TestUtil
 
     public static byte[] GenerateId()
     {
-        return Chromia.Postchain.Client.Util.Sha256(
+        return PostchainUtil.Sha256(
             BitConverter.GetBytes(GenerateNumber())
         );
     }
@@ -28,6 +28,6 @@ public class TestUtil
             chainId
             }.ToArray();
 
-        return Gtv.Hash(gtv);
+        return PostchainUtil.HashGTV(gtv);
     }
 }

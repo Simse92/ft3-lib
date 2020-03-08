@@ -1,7 +1,7 @@
 using Chromia.Postchain.Ft3;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 using System;
 using Xunit;
 

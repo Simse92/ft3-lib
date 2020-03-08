@@ -1,4 +1,4 @@
-using Chromia.Postchain.Client.GTV;
+using Chromia.Postchain.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -18,7 +18,7 @@ namespace Chromia.Postchain.Ft3
         public byte[] GetId()
         {
             var body = new List<dynamic>(){this.Name, this.ChainId};
-            return Gtv.Hash(body.ToArray());
+            return PostchainUtil.HashGTV(body.ToArray());
         }
 
         public static async Task<Asset> Register(string name, byte[] chainId, Blockchain blockchain)

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using Chromia.Postchain.Client.GTV;
+using Chromia.Postchain.Client;
 
 namespace Chromia.Postchain.Ft3
 {
@@ -59,7 +59,7 @@ namespace Chromia.Postchain.Ft3
                 
             }.ToArray();
             
-            return Gtv.Hash(gtv);
+            return PostchainUtil.HashGTV(gtv);
         }
     }
 }

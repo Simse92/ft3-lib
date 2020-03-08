@@ -1,4 +1,4 @@
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -115,7 +115,7 @@ namespace Chromia.Postchain.Ft3
             return await Task.WhenAll(chainIds.Select(elem => Blockchain.Initialize(elem, this._directoryService)));
         }
         
-        public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params dynamic[] queryObject)
+        public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params (string name, object content)[] queryObject)
         {
             return await this.Connection.Query<T>(name, queryObject);
         }

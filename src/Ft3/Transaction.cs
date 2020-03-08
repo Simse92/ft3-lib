@@ -1,14 +1,14 @@
-using Chromia.Postchain.Client.GTX;
+using Chromia.Postchain.Client;
 using System.Threading.Tasks;
 
 namespace Chromia.Postchain.Ft3
 {
     public class Transaction
     {
-        private readonly Client.GTX.Transaction _tx;
+        private readonly Client.Transaction _tx;
         private readonly Blockchain _blockchain;
 
-        public Transaction(Client.GTX.Transaction tx, Blockchain blockchain)
+        public Transaction(Client.Transaction tx, Blockchain blockchain)
         {
             this._tx = tx;
             this._blockchain = blockchain;

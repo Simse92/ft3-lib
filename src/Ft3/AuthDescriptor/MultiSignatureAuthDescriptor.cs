@@ -1,4 +1,4 @@
-using Chromia.Postchain.Client.GTV;
+using Chromia.Postchain.Client;
 using System.Collections.Generic;
 using System.Linq;
 using System;
@@ -88,7 +88,7 @@ namespace Chromia.Postchain.Ft3
                 this.AuthRule?.ToGTV()
             }.ToArray();
 
-            return Gtv.Hash(gtv);
+            return PostchainUtil.HashGTV(gtv);
         }
     }
 }

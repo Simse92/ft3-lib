@@ -1,5 +1,4 @@
-using Chromia.Postchain.Client.GTX;
-using Chromia.Postchain.Client.GTX.ASN1Messages;
+using Chromia.Postchain.Client;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,8 +18,8 @@ namespace Chromia.Postchain.Ft3
         public PaymentOperation[] Extract()
         {
             List<PaymentOperation> paymentOperations = new List<PaymentOperation>();
-            GTXValue value = Gtx.Deserialize(this._transaction);
-            dynamic[] transaction = value.Array[0].ToDynamicArray();
+            GTXValue value = PostchainUtil.DeserializeGTX(this._transaction);
+            dynamic[] transaction = value.Array[0].ToObjectArray();
                         
             foreach (var operation in transaction[1])
             {

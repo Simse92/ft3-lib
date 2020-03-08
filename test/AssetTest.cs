@@ -50,7 +50,7 @@ public class AssetTest
 
         var assetName = TestUtil.GenerateAssetName();
         var testChainId = TestUtil.GenerateId();
-        var assetId = Chromia.Postchain.Client.GTV.Gtv.Hash(new List<dynamic>(){assetName, testChainId}.ToArray());
+        var assetId = Chromia.Postchain.Client.PostchainUtil.HashGTV(new List<dynamic>(){assetName, testChainId}.ToArray());
         
         Asset asset = await Asset.Register(
             assetName,

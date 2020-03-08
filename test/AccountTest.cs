@@ -12,7 +12,7 @@ public class UserTest
     [Fact(Skip = "Working")]
     public void AccountTest1()
     {
-        var keyPair = Chromia.Postchain.Client.Util.MakeKeyPair();
+        var keyPair = Chromia.Postchain.Client.PostchainUtil.MakeKeyPair();
         var user = new KeyPair(Util.ByteArrayToString(keyPair["privKey"]));
 
         Assert.Equal(user.PrivKey, keyPair["privKey"]);  
