@@ -25,10 +25,10 @@ namespace Chromia.Postchain.Ft3
             return await this._tx.PostAndWaitConfirmation();
         }
 
-        public byte[] Raw()
-        {
-            return Util.HexStringToBuffer(_tx.Encode());
-        }
+        // public byte[] Raw()
+        // {
+        //     return Util.HexStringToBuffer(_tx.Encode());
+        // }
     }
 
 }

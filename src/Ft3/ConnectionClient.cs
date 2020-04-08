@@ -9,13 +9,21 @@ namespace Chromia.Postchain.Ft3
         public string ChainID;
         public GTXClient Gtx;
 
+        public ConnectionClient(string chainURL, RESTClient restClient)
+        {
+            this.ChainUrl = chainURL;
+            this.ChainID = restClient.BlockchainRID;
+
+            this.Gtx = new GTXClient(restClient);
+        }
+
         public ConnectionClient(string chainURL, string chainID)
         {
             this.ChainUrl = chainURL;
             this.ChainID = chainID;
 
             var restClient = new RESTClient(chainURL, chainID);
-            this.Gtx = new GTXClient(restClient, chainID);
+            this.Gtx = new GTXClient(restClient);
         }
 
         public async Task<(T content, PostchainErrorControl control)> Query<T>(string name, params (string name, object content)[] queryObject)

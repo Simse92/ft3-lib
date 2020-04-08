@@ -140,19 +140,19 @@ namespace Chromia.Postchain.Ft3
             return account;
         }
 
-        public static byte[] RawRegisterTransaction(AuthDescriptor authDescriptor, AuthDescriptor ssoAuthDescriptor, BlockchainSession session)
-        {
-            TransactionBuilder txBuilder = session.Blockchain.CreateTransactionBuilder();
-            List<byte[]> signers = new List<byte[]>();
-            txBuilder.AddOperation(AccountDevOperations.Register(authDescriptor));
-            txBuilder.AddOperation(AccountOperations.AddAuthDescriptor(authDescriptor.ID, authDescriptor.ID, ssoAuthDescriptor));
+        // public static byte[] RawRegisterTransaction(AuthDescriptor authDescriptor, AuthDescriptor ssoAuthDescriptor, BlockchainSession session)
+        // {
+        //     TransactionBuilder txBuilder = session.Blockchain.CreateTransactionBuilder();
+        //     List<byte[]> signers = new List<byte[]>();
+        //     txBuilder.AddOperation(AccountDevOperations.Register(authDescriptor));
+        //     txBuilder.AddOperation(AccountOperations.AddAuthDescriptor(authDescriptor.ID, authDescriptor.ID, ssoAuthDescriptor));
             
-            signers.AddRange(authDescriptor.Signers);
-            // TODO Add sso signers
-            var tx = txBuilder.Build(signers);
-            tx.Sign(session.User.KeyPair);
-            return tx.Raw();
-        }
+        //     signers.AddRange(authDescriptor.Signers);
+        //     // TODO Add sso signers
+        //     var tx = txBuilder.Build(signers);
+        //     tx.Sign(session.User.KeyPair);
+        //     return tx.Raw();
+        // }
         
         public static async Task<Account[]> GetByIds(List<byte[]> ids, BlockchainSession session)
         {
