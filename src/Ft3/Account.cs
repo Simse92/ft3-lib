@@ -101,8 +101,8 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account[]> GetByParticipantId(byte[] id, BlockchainSession session)
         {
-            var gtv = AccountQueries.AccountsByParticipantId(id);
-            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>(gtv[0], gtv[1]);
+            // var gtv = AccountQueries.AccountsByParticipantId(id);
+            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>("ft3.get_accounts_by_participant_id", ("id", Util.ByteArrayToString(id)));
             
      
             var idList = new List<byte[]>();
@@ -116,8 +116,8 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account[]> GetByAuthDescriptorId(byte[] id, BlockchainSession session)
         {
-            var gtv = AccountQueries.AccountsByAuthDescriptorId(id);
-            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>(gtv[0], gtv[1]);
+            // var gtv = AccountQueries.AccountsByAuthDescriptorId(id);
+            (dynamic content, PostchainErrorControl control) accountIds = await session.Query<dynamic>("ft3.get_accounts_by_auth_descriptor_id", ("descriptor_id", Util.ByteArrayToString(id)));
 
             var idList = new List<byte[]>();
             foreach (var accountId in accountIds.content)
@@ -168,8 +168,8 @@ namespace Chromia.Postchain.Ft3
 
         public static async Task<Account> GetById(byte[] id, BlockchainSession session)
         {
-            var gtv = AccountQueries.AccountById(id);
-            (dynamic content, PostchainErrorControl control) account = await session.Query<dynamic>(gtv[0], gtv[1]);
+            // var gtv = AccountQueries.AccountById(id);
+            (dynamic content, PostchainErrorControl control) account = await session.Query<dynamic>("ft3.get_account_by_id", ("id", Util.ByteArrayToString(id)));
 
             if(account.control.Error)
             {
@@ -231,8 +231,8 @@ namespace Chromia.Postchain.Ft3
 
         private async Task SyncAuthDescriptors()
         {
-            var authGtv = AccountQueries.AccountAuthDescriptors(this.Id);
-            (dynamic content, PostchainErrorControl control) authDescriptors = await this.Session.Query<dynamic>(authGtv[0], authGtv[1]);
+            // var authGtv = AccountQueries.AccountAuthDescriptors(this.Id);
+            (dynamic content, PostchainErrorControl control) authDescriptors = await this.Session.Query<dynamic>("ft3.get_account_auth_descriptors", ("id", Util.ByteArrayToString(this.Id)));
 
             var authDescriptorFactory = new AuthDescriptorFactory();
             List<AuthDescriptor> authList = new List<AuthDescriptor>();

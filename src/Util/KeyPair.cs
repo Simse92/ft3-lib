@@ -7,6 +7,12 @@ namespace Chromia.Postchain.Ft3
         public readonly byte[] PubKey;
         public readonly byte[] PrivKey;
 
+        public KeyPair(byte[] privateKey, byte[] pubKey)
+        {
+            PubKey = pubKey;
+            PrivKey = privateKey;
+        }
+
         public KeyPair(string privateKey = null)
         {
             if(privateKey != null)
